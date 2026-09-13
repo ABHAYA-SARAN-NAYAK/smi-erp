@@ -1,0 +1,12 @@
+{
+  "companyName": "Demo Industries Pvt Ltd",
+  "companyAddress": "12 Sample Street, Demo City 600000",
+  "companyPhone": "9999999999",
+  "companyGST": "33AAAAA0000A1Z0",
+  "companyState": "Tamil Nadu",
+  "invoicePrefix": "INV-",
+  "lastInvoiceNo": 1000,
+  "defaultCgstPercent": 9,
+  "defaultSgstPercent": 9,
+  "holidayOtMultiplier": 2
+}

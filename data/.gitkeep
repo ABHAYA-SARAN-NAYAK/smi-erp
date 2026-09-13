@@ -1,0 +1,5 @@
+# /data
+# Placeholder for mock JSON data files (PRD §8):
+# mock-companies.json, mock-products.json, mock-employees.json,
+# mock-invoices.json, mock-balance-confirmation.json, mock-gst-summary.json,
+# mock-job-work.json, mock-attendance.json

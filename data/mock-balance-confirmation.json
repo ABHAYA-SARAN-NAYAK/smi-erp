@@ -1,0 +1,18 @@
+[
+  {
+    "billNo": "1001",
+    "date": "2026-09-05",
+    "company": "Acme Fabrication Pvt Ltd",
+    "poNo": "PO-2291",
+    "description": "6MM SS Insert",
+    "unitPrice": 45,
+    "billAmount": 10620,
+    "amountDueDate": "2026-10-20",
+    "debitNoteIfAny": 0,
+    "actualReceivableAmount": 10620,
+    "amountReceivedDate": null,
+    "amountReceived": 0,
+    "balanceAmount": 10620,
+    "status": "Pending"
+  }
+]

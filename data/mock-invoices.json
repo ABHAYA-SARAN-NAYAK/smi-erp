@@ -1,0 +1,26 @@
+[
+  {
+    "id": "inv1",
+    "invoiceNo": "INV-1001",
+    "date": "2026-09-05",
+    "type": "With Tax",
+    "companyId": "c1",
+    "poNo": "PO-2291",
+    "items": [
+      {
+        "partNo": "AC-INS-001",
+        "particulars": "6MM SS Insert",
+        "hsn": "39269099",
+        "qty": 200,
+        "rate": 45,
+        "amount": 9000
+      }
+    ],
+    "cgstPercent": 9,
+    "sgstPercent": 9,
+    "cgstAmount": 810,
+    "sgstAmount": 810,
+    "grandTotal": 10620,
+    "status": "Active"
+  }
+]

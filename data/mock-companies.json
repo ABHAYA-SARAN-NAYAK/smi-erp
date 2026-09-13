@@ -1,0 +1,26 @@
+[
+  {
+    "id": "c1",
+    "name": "Acme Fabrication Pvt Ltd",
+    "gstNo": "29AACFA1234B1Z5",
+    "address": "Plot 12, Industrial Estate, Peenya, Bangalore 560058",
+    "state": "Karnataka",
+    "creditDays": 45
+  },
+  {
+    "id": "c2",
+    "name": "Bluewave Hydraulics Ltd",
+    "gstNo": "27AAACB5678C1ZQ",
+    "address": "45 Andheri MIDC, Mumbai 400093",
+    "state": "Maharashtra",
+    "creditDays": 30
+  },
+  {
+    "id": "c3",
+    "name": "Sunrise Rubber Components",
+    "gstNo": "33AABCS9012D1ZR",
+    "address": "18 Guindy Industrial Area, Chennai 600032",
+    "state": "Tamil Nadu",
+    "creditDays": 60
+  }
+]

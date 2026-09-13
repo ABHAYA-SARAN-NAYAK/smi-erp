@@ -1,0 +1,23 @@
+[
+  {
+    "id": "e1",
+    "name": "Ravi Kumar",
+    "designation": "Supervisor",
+    "salaryType": "Monthly",
+    "rate": 18000
+  },
+  {
+    "id": "e2",
+    "name": "Suresh M",
+    "designation": "Operator",
+    "salaryType": "Daily",
+    "rate": 550
+  },
+  {
+    "id": "e3",
+    "name": "Kavitha R",
+    "designation": "Helper",
+    "salaryType": "Hourly",
+    "rate": 55
+  }
+]

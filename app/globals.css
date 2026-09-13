@@ -1,1 +1,261 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "../styles/tokens.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * ── Tailwind v4 Theme Extensions — Dark Industrial Fintech Palette ─────
+ */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-inter);
+  --font-display: var(--font-fraunces);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* ── Color Mapping for Utilities ────────────────────────── */
+  --color-bg-app: #121317;
+  --color-bg-surface: #1a1c23;
+  --color-bg-surface-hover: #21232c;
+  --color-border-subtle: #2a2d38;
+  --color-text-primary: #E9ECEF;
+  --color-text-secondary: #8b8fa3;
+  --color-accent-primary: #FB5607;
+  --color-accent-secondary: #8338EC;
+
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+  --color-warning: #f59e0b;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+}
+
+:root {
+  --background: #121317;
+  --foreground: #E9ECEF;
+  --card: #1a1c23;
+  --card-foreground: #E9ECEF;
+  --popover: #1a1c23;
+  --popover-foreground: #E9ECEF;
+  --primary: #FB5607;
+  --primary-foreground: #ffffff;
+  --secondary: #21232c;
+  --secondary-foreground: #E9ECEF;
+  --muted: #121317;
+  --muted-foreground: #8b8fa3;
+  --accent: #8338EC;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --border: #2a2d38;
+  --input: #2a2d38;
+  --ring: #FB5607;
+
+  --radius: 0.75rem;
+
+  --sidebar: #121317;
+  --sidebar-foreground: #E9ECEF;
+  --sidebar-primary: #FB5607;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #21232c;
+  --sidebar-accent-foreground: #E9ECEF;
+  --sidebar-border: #2a2d38;
+  --sidebar-ring: #FB5607;
+}
+
+/* ── Base Styles ──────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-[#2a2d38];
+  }
+  body {
+    background-color: #121317;
+    color: #E9ECEF;
+    @apply antialiased selection:bg-[#FB5607] selection:text-white;
+  }
+  html {
+    @apply font-sans;
+    color-scheme: dark;
+  }
+}
+
+/* ── Glow Card & Blueprint Industrial Utilities ─────────────── */
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .font-mono-spec {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: -0.02em;
+  }
+
+  /* Blueprint / Engineering Schematic Grid Canvas */
+  .bg-blueprint-canvas {
+    background-color: #121317;
+    background-image: 
+      linear-gradient(to right, rgba(42, 45, 56, 0.2) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(42, 45, 56, 0.2) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-attachment: fixed;
+  }
+
+  /* Base Glow Card Surface */
+  .glow-card-base {
+    background-color: #1a1c23;
+    border: 1px solid #2a2d38;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+  }
+  .glow-card-base:hover {
+    transform: translateY(-3px);
+    border-color: #3f4454;
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.6);
+  }
+
+  /* ── 1. Orange Sales/Primary Glow Card (#FB5607) ── */
+  .glow-card-orange {
+    background-color: #1a1c23;
+    background-image: radial-gradient(circle at 10% 10%, rgba(251, 86, 7, 0.18) 0%, transparent 65%);
+    border: 1px solid rgba(251, 86, 7, 0.3);
+  }
+  .glow-card-orange:hover {
+    background-image: radial-gradient(circle at 10% 10%, rgba(251, 86, 7, 0.28) 0%, transparent 70%);
+    border-color: rgba(251, 86, 7, 0.6);
+    box-shadow: 0 16px 36px -6px rgba(251, 86, 7, 0.25);
+  }
+
+  /* ── 2. Violet GST/Tax Glow Card (#8338EC) ── */
+  .glow-card-violet {
+    background-color: #1a1c23;
+    background-image: radial-gradient(circle at 10% 10%, rgba(131, 56, 236, 0.18) 0%, transparent 65%);
+    border: 1px solid rgba(131, 56, 236, 0.3);
+  }
+  .glow-card-violet:hover {
+    background-image: radial-gradient(circle at 10% 10%, rgba(131, 56, 236, 0.28) 0%, transparent 70%);
+    border-color: rgba(131, 56, 236, 0.6);
+    box-shadow: 0 16px 36px -6px rgba(131, 56, 236, 0.25);
+  }
+
+  /* ── 3. Red Receivables/Overdue Glow Card (#ef4444) ── */
+  .glow-card-red {
+    background-color: #1a1c23;
+    background-image: radial-gradient(circle at 10% 10%, rgba(239, 68, 68, 0.2) 0%, transparent 65%);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+  }
+  .glow-card-red:hover {
+    background-image: radial-gradient(circle at 10% 10%, rgba(239, 68, 68, 0.32) 0%, transparent 70%);
+    border-color: rgba(239, 68, 68, 0.65);
+    box-shadow: 0 16px 36px -6px rgba(239, 68, 68, 0.3);
+  }
+
+  /* ── 4. Blue Job-Work Glow Card (#3b82f6) ── */
+  .glow-card-blue {
+    background-color: #1a1c23;
+    background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.18) 0%, transparent 65%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  .glow-card-blue:hover {
+    background-image: radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.28) 0%, transparent 70%);
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 16px 36px -6px rgba(59, 130, 246, 0.25);
+  }
+
+  /* ── 5. Green Labour Glow Card (#22c55e) ── */
+  .glow-card-green {
+    background-color: #1a1c23;
+    background-image: radial-gradient(circle at 10% 10%, rgba(34, 197, 94, 0.18) 0%, transparent 65%);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+  .glow-card-green:hover {
+    background-image: radial-gradient(circle at 10% 10%, rgba(34, 197, 94, 0.28) 0%, transparent 70%);
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 0 16px 36px -6px rgba(34, 197, 94, 0.25);
+  }
+
+  /* ── Panel / Container Glow Card (Subtle Orange Top-Left Light) ── */
+  .glow-panel {
+    background-color: #1a1c23;
+    background-image: radial-gradient(circle at 0% 0%, rgba(251, 86, 7, 0.08) 0%, transparent 45%);
+    border: 1px solid #2a2d38;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .glow-panel:hover {
+    border-color: #383c4a;
+    box-shadow: 0 14px 38px -5px rgba(0, 0, 0, 0.6);
+  }
+
+  /* HERO Card (Feature Highlight with Full Gradient Wash) */
+  .glow-card-hero-orange {
+    background: linear-gradient(135deg, rgba(251, 86, 7, 0.95) 0%, rgba(217, 69, 0, 0.9) 100%);
+    background-image: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 14px 40px -6px rgba(251, 86, 7, 0.45);
+  }
+  .glow-card-hero-orange:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 50px -4px rgba(251, 86, 7, 0.6);
+  }
+
+  .glow-card-hero-danger {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(185, 28, 28, 0.9) 100%);
+    background-image: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 14px 40px -6px rgba(239, 68, 68, 0.45);
+  }
+  .glow-card-hero-danger:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 50px -4px rgba(239, 68, 68, 0.6);
+  }
+
+  /* Icon Badge Glow Effects */
+  .icon-glow-orange {
+    background: #FB5607;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(251, 86, 7, 0.5);
+  }
+  .icon-glow-violet {
+    background: #8338EC;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(131, 56, 236, 0.5);
+  }
+  .icon-glow-red {
+    background: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+  }
+  .icon-glow-blue {
+    background: #3b82f6;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+  .icon-glow-green {
+    background: #22c55e;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  }
+
+  /* Buttons */
+  .btn-accent-primary {
+    background-color: #FB5607;
+    color: #ffffff;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 14px rgba(251, 86, 7, 0.3);
+  }
+  .btn-accent-primary:hover {
+    background-color: #e04a00;
+    box-shadow: 0 6px 20px rgba(251, 86, 7, 0.45);
+    transform: translateY(-1px);
+  }
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "employeeId": "e1",
+    "date": "2026-09-01",
+    "status": "Present",
+    "otHours": 2,
+    "holidayOtHours": 0,
+    "advance": 0
+  },
+  {
+    "employeeId": "e2",
+    "date": "2026-09-01",
+    "status": "Present",
+    "otHours": 0,
+    "holidayOtHours": 4,
+    "advance": 500
+  }
+]

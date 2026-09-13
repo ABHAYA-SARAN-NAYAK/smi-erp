@@ -1,0 +1,4 @@
+# /components/shared
+# Placeholder for shared components:
+# DataTable, FilterBar, StatCard, StatusPill, KpiCard,
+# Autocomplete, SidePanel, Toast, EmptyState, LoadingSkeleton, ErrorState

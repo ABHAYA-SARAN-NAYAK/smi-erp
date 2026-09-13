@@ -1,0 +1,34 @@
+[
+  {
+    "id": "p1",
+    "companyId": "c1",
+    "partNo": "AC-INS-001",
+    "partName": "6MM SS Insert",
+    "hsn": "39269099",
+    "rate": 45
+  },
+  {
+    "id": "p2",
+    "companyId": "c1",
+    "partNo": "AC-INS-002",
+    "partName": "8MM Nipple Insert",
+    "hsn": "39269099",
+    "rate": 62
+  },
+  {
+    "id": "p3",
+    "companyId": "c2",
+    "partNo": "BW-CAP-010",
+    "partName": "Thread Cap 10T",
+    "hsn": "39174090",
+    "rate": 18
+  },
+  {
+    "id": "p4",
+    "companyId": "c3",
+    "partNo": "SR-KIT-005",
+    "partName": "TR Kit Standard",
+    "hsn": "40169990",
+    "rate": 260
+  }
+]

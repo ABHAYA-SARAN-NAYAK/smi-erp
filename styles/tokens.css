@@ -1,0 +1,33 @@
+/*
+ * SMI ERP — Dark Fintech Design Tokens
+ *
+ * Vivid dark finance / wallet-app color tokens:
+ * Near-black charcoal background, dark surface panels,
+ * vivid electric orange & violet accents.
+ */
+
+:root {
+  /* ── Main Palette Tokens ─────────────────────────────────── */
+  --bg-app: #121317;           /* main app background, near-black charcoal */
+  --bg-surface: #1a1c23;       /* card/panel background */
+  --bg-surface-hover: #21232c; /* card hover state */
+  --border-subtle: #2a2d38;    /* hairline borders on cards/tables */
+  --text-primary: #E9ECEF;     /* main text, off-white */
+  --text-secondary: #8b8fa3;   /* muted/secondary text */
+  --accent-primary: #FB5607;   /* vivid orange - primary buttons, active nav, primary brand */
+  --accent-secondary: #8338EC; /* electric violet - secondary highlights, GST/analytics accents */
+  --success: #22c55e;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --warning: #f59e0b;
+
+  /* ── Mapped PRD Tokens (dark theme mode) ──────────────────── */
+  --ink: #E9ECEF;               /* mapped to primary text */
+  --ink-soft: #8b8fa3;          /* mapped to secondary text */
+  --paper: #fffdf8;             /* document surfaces (invoices remain paper-toned) */
+  --amber: #FB5607;             /* mapped to vivid orange accent */
+  --amber-soft: rgba(251, 86, 7, 0.15); /* translucent orange background */
+  --slate-bg: #121317;          /* app canvas background */
+  --panel-bg: #1a1c23;          /* card background */
+  --line: #2a2d38;              /* borders */
+}

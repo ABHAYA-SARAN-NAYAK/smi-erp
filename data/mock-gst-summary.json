@@ -1,0 +1,14 @@
+[
+  {
+    "sNo": 1,
+    "billNo": "1001",
+    "billDate": "2026-09-05",
+    "suppliedTo": "Acme Fabrication Pvt Ltd",
+    "gstNo": "29AACFA1234B1Z5",
+    "amount": 9000,
+    "sgst": 810,
+    "cgst": 810,
+    "totalAmount": 10620,
+    "month": "Sep-2026"
+  }
+]

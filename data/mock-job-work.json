@@ -1,0 +1,15 @@
+[
+  {
+    "id": "jw1",
+    "partyName": "Ganesh Job Works",
+    "date": "2026-09-08",
+    "partNo": "AC-INS-001",
+    "qty": 500,
+    "rate": 8,
+    "totalAmount": 4000,
+    "amountDueDate": "2026-09-22",
+    "paidAmount": 0,
+    "paidDate": null,
+    "balanceAmount": 4000
+  }
+]
