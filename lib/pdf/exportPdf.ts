@@ -22,7 +22,6 @@ export async function downloadInvoicePdf(
     backgroundColor: "#fffdf8", // PRD §5 --paper background
   });
 
-  const imgData = canvas.toDataURL("image/png");
   const pdf = new jsPDF({
     orientation: "portrait",
     unit: "mm",
