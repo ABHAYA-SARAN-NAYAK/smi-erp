@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { InvoicePreview } from "@/components/invoice/InvoicePreview";
 import {
   Company,
   Product,
@@ -70,6 +72,7 @@ export function InvoiceForm({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [printReady, setPrintReady] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const selectedCompany = companies.find((c) => c.id === selectedCompanyId) || null;
@@ -220,12 +223,15 @@ export function InvoiceForm({
 
   const handleDownloadPdf = async () => {
     setDownloading(true);
+    setPrintReady(true);
     try {
-      await downloadInvoicePdf("invoice-paper-preview", `${invoiceNo || "Invoice"}.pdf`);
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+      await downloadInvoicePdf("invoice-paper-print", `${invoiceNo || "Invoice"}.pdf`);
     } catch (err: any) {
       console.error("PDF download failed:", err);
       setErrorMsg("Failed to generate PDF download.");
     } finally {
+      setPrintReady(false);
       setDownloading(false);
     }
   };
@@ -527,6 +533,12 @@ export function InvoiceForm({
           return created;
         }}
       />
+      {printReady && typeof document !== "undefined" && createPortal(
+        <div className="pdf-print-root" aria-hidden="true">
+          <InvoicePreview invoiceNo={invoiceNo} date={date} type={invoiceType} poNo={poNo} company={selectedCompany} items={items} cgstPercent={cgstPercent} sgstPercent={sgstPercent} settings={settings} printMode />
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

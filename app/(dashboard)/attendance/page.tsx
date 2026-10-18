@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { dataLayer } from "@/lib/data-layer";
 import {
   Employee,
@@ -62,6 +63,7 @@ export default function AttendancePage() {
   // Salary Slip Modal State
   const [viewSlipPayroll, setViewSlipPayroll] = useState<PayrollRow | null>(null);
   const [downloadingSlip, setDownloadingSlip] = useState(false);
+  const [salaryPrintReady, setSalaryPrintReady] = useState(false);
   const [employeePanelOpen, setEmployeePanelOpen] = useState(false);
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
   const [savingEmployee, setSavingEmployee] = useState(false);
@@ -271,17 +273,18 @@ export default function AttendancePage() {
   // Salary Slip PDF Download
   const handleDownloadSalarySlip = async (payroll: PayrollRow) => {
     setViewSlipPayroll(payroll);
+    setSalaryPrintReady(true);
     setDownloadingSlip(true);
     try {
-      setTimeout(async () => {
-        await downloadInvoicePdf(
-          "salary-slip-paper",
-          `SalarySlip_${payroll.employeeName.replace(/\s+/g, "_")}_${payroll.month}.pdf`
-        );
-        setDownloadingSlip(false);
-      }, 300);
+      await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+      await downloadInvoicePdf(
+        "salary-slip-print",
+        `SalarySlip_${payroll.employeeName.replace(/\s+/g, "_")}_${payroll.month}.pdf`
+      );
     } catch {
       toastError("Download Error", "Could not generate Salary Slip PDF.");
+    } finally {
+      setSalaryPrintReady(false);
       setDownloadingSlip(false);
     }
   };
@@ -778,6 +781,12 @@ export default function AttendancePage() {
           </div>
         </form>
       </SidePanel>
+      {salaryPrintReady && viewSlipPayroll && typeof document !== "undefined" && createPortal(
+        <div className="pdf-print-root" aria-hidden="true">
+          <SalarySlipDocument payroll={viewSlipPayroll} employee={employees.find((item) => item.id === viewSlipPayroll.employeeId)} settings={settings} printMode />
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

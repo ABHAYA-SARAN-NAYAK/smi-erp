@@ -294,6 +294,9 @@
   #salary-slip-paper [class~="border-line/60"] { border-color: #94a3b8; }
   #salary-slip-paper .divide-line > :not([hidden]) ~ :not([hidden]) { border-color: #cbd5e1; }
 
+  .pdf-print-root { position: fixed; top: 0; left: -10000px; width: 794px; pointer-events: none; z-index: -1; }
+  .pdf-print-root .doc-preview-shell { width: 794px !important; height: auto !important; overflow: visible; }
+  .pdf-print-root .doc-preview-stage { width: 794px !important; transform: none !important; }
   .doc-preview-shell { position: relative; width: 100%; overflow: hidden; }
   .doc-preview-stage { transform-origin: top left; display: flex; flex-direction: column; gap: 16px; }
   .doc-page { box-sizing: border-box; position: relative; width: 794px; height: 1123px; padding: 40px; overflow: hidden; border: 1px solid #d9dde8; border-radius: 16px; background: #fffdf8; color: #1a1a1a; font-family: var(--font-inter), Inter, sans-serif; font-size: 12px; line-height: 1.45; }
