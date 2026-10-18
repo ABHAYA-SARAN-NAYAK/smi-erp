@@ -92,16 +92,17 @@ export default function AttendancePage() {
       setPayrollRows(payroll);
       setAllAttendance(attendance);
       setPayrollStatus(monthStatus.status);
-    } catch (err: any) {
-      console.error("Failed to load attendance data:", err);
-      setError(err.message || "Failed to load data");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load data";
+      setError(message);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    void loadData();
+    const timer = window.setTimeout(() => { void loadData(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [selectedMonth]);
 
   const openEmployeePanel = (employee?: Employee) => {
@@ -255,8 +256,8 @@ export default function AttendancePage() {
         `Updated attendance for ${selectedEmployee?.name} on ${editingDayDate}.`
       );
       setEditingDayDate(null);
-    } catch (err: any) {
-      toastError("Failed to Save", err.message);
+    } catch (err: unknown) {
+      toastError("Failed to Save", err instanceof Error ? err.message : "Could not save attendance.");
     } finally {
       setSavingDay(false);
     }
@@ -279,7 +280,7 @@ export default function AttendancePage() {
         );
         setDownloadingSlip(false);
       }, 300);
-    } catch (err) {
+    } catch {
       toastError("Download Error", "Could not generate Salary Slip PDF.");
       setDownloadingSlip(false);
     }
