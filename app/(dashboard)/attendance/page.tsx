@@ -49,6 +49,7 @@ export default function AttendancePage() {
 
   const [payrollRows, setPayrollRows] = useState<PayrollRow[]>([]);
   const [allAttendance, setAllAttendance] = useState<AttendanceEntry[]>([]);
+  const [payrollStatus, setPayrollStatus] = useState<"Draft" | "Finalized" | "Paid">("Draft");
 
   // Day Edit Modal State
   const [editingDayDate, setEditingDayDate] = useState<string | null>(null);
@@ -74,7 +75,7 @@ export default function AttendancePage() {
     setError(null);
     try {
       const [empList, sett] = await Promise.all([
-        dataLayer.getEmployees(),
+        dataLayer.getEmployees({ includeInactive: true }),
         dataLayer.getSettings(),
       ]);
 
@@ -83,12 +84,14 @@ export default function AttendancePage() {
       const defaultEmp = empList[0]?.id || "";
       setSelectedEmployeeId(defaultEmp);
 
-      const [payroll, attendance] = await Promise.all([
+      const [payroll, attendance, monthStatus] = await Promise.all([
         dataLayer.getMonthlyPayroll(selectedMonth),
         dataLayer.getAttendance(),
+        dataLayer.getPayrollMonthStatus(selectedMonth),
       ]);
       setPayrollRows(payroll);
       setAllAttendance(attendance);
+      setPayrollStatus(monthStatus.status);
     } catch (err: any) {
       console.error("Failed to load attendance data:", err);
       setError(err.message || "Failed to load data");
@@ -139,14 +142,38 @@ export default function AttendancePage() {
 
   const refreshPayroll = async () => {
     try {
-      const [payroll, attendance] = await Promise.all([
+      const [payroll, attendance, monthStatus] = await Promise.all([
         dataLayer.getMonthlyPayroll(selectedMonth),
         dataLayer.getAttendance(),
+        dataLayer.getPayrollMonthStatus(selectedMonth),
       ]);
       setPayrollRows(payroll);
       setAllAttendance(attendance);
+      setPayrollStatus(monthStatus.status);
     } catch (e) {
       console.error("Payroll refresh error", e);
+    }
+  };
+
+  const changePayrollStatus = async (status: "Draft" | "Finalized" | "Paid") => {
+    try {
+      const next = await dataLayer.setPayrollMonthStatus(selectedMonth, status);
+      setPayrollStatus(next.status);
+      success("Payroll status updated", `${selectedMonth} is now ${next.status}.`);
+    } catch (err) {
+      toastError("Could not update payroll status", err instanceof Error ? err.message : "Try again.");
+    }
+  };
+
+  const toggleEmployeeStatus = async (employee: Employee) => {
+    try {
+      const updated = employee.status === "Inactive"
+        ? await dataLayer.reactivateEmployee(employee.id, new Date().toISOString().slice(0, 10))
+        : await dataLayer.deactivateEmployee(employee.id, new Date().toISOString().slice(0, 10));
+      setEmployees((current) => current.map((item) => item.id === updated.id ? updated : item));
+      success("Employee status updated", `${updated.name} is ${updated.status?.toLowerCase()}.`);
+    } catch (err) {
+      toastError("Could not update employee", err instanceof Error ? err.message : "Try again.");
     }
   };
 
@@ -388,6 +415,8 @@ export default function AttendancePage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <span className="rounded-full border border-line bg-panel-bg px-2.5 py-1 text-[11px] font-semibold text-ink-soft">Payroll: {payrollStatus}</span>
+          {payrollStatus === "Draft" ? <button type="button" onClick={() => changePayrollStatus("Finalized")} className="rounded-lg border border-line px-3 py-2 text-xs font-semibold text-ink hover:bg-slate-bg">Finalize month</button> : <button type="button" onClick={() => changePayrollStatus("Draft")} className="rounded-lg border border-line px-3 py-2 text-xs font-semibold text-ink hover:bg-slate-bg">Reopen month</button>}
           <button type="button" onClick={() => openEmployeePanel()} className="inline-flex items-center gap-1.5 rounded-lg bg-amber px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber/90">
             <Plus className="h-3.5 w-3.5" aria-hidden="true" /> Add Employee
           </button>
@@ -742,7 +771,10 @@ export default function AttendancePage() {
           <div><label htmlFor="employee-joining" className="mb-1 block font-semibold text-ink">Joining date *</label><input id="employee-joining" type="date" required readOnly={Boolean(editingEmployeeId)} value={employeeForm.joiningDate} onChange={(e) => setEmployeeForm({ ...employeeForm, joiningDate: e.target.value })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink" /></div>
           <div><label htmlFor="employee-phone" className="mb-1 block font-semibold text-ink">Phone</label><input id="employee-phone" inputMode="numeric" pattern="[6-9][0-9]{9}" value={employeeForm.phone} onChange={(e) => setEmployeeForm({ ...employeeForm, phone: e.target.value })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink" /></div>
           <div><label htmlFor="employee-notes" className="mb-1 block font-semibold text-ink">Notes</label><textarea id="employee-notes" maxLength={200} value={employeeForm.notes} onChange={(e) => setEmployeeForm({ ...employeeForm, notes: e.target.value })} className="min-h-20 w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink" /></div>
-          <button type="submit" disabled={savingEmployee} className="rounded-lg bg-amber px-4 py-2.5 font-semibold text-white disabled:opacity-60">{savingEmployee ? "Saving…" : editingEmployeeId ? "Save changes" : "Add employee"}</button>
+          <div className="flex items-center gap-2">
+            <button type="submit" disabled={savingEmployee} className="flex-1 rounded-lg bg-amber px-4 py-2.5 font-semibold text-white disabled:opacity-60">{savingEmployee ? "Saving…" : editingEmployeeId ? "Save changes" : "Add employee"}</button>
+            {editingEmployeeId && selectedEmployee && <button type="button" onClick={() => { void toggleEmployeeStatus(selectedEmployee); setEmployeePanelOpen(false); }} className="rounded-lg border border-line px-3 py-2.5 font-semibold text-ink hover:bg-slate-bg">{selectedEmployee.status === "Inactive" ? "Reactivate" : "Deactivate"}</button>}
+          </div>
         </form>
       </SidePanel>
     </div>

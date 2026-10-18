@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { dataLayer } from "@/lib/data-layer";
-import { Settings } from "@/lib/data-layer/types";
+import { Settings, Holiday } from "@/lib/data-layer/types";
 import { LoadingSkeleton, ErrorState, useToast } from "@/components/shared";
 import {
   Building2,
@@ -38,6 +38,9 @@ export default function SettingsPage() {
   const [defaultSgstPercent, setDefaultSgstPercent] = useState<number>(9);
   
   const [holidayOtMultiplier, setHolidayOtMultiplier] = useState<number>(2);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [holidayDate, setHolidayDate] = useState("");
+  const [holidayName, setHolidayName] = useState("");
 
   // Form states - Account Credentials
   const [currentUsername, setCurrentUsername] = useState("admin");
@@ -60,7 +63,9 @@ export default function SettingsPage() {
     setError(null);
     try {
       const data = await dataLayer.getSettings();
+      const holidayList = await dataLayer.getHolidays();
       setSettings(data);
+      setHolidays(holidayList);
       setCompanyName(data.companyName || "");
       setCompanyAddress(data.companyAddress || "");
       setCompanyPhone(data.companyPhone || "");
@@ -550,6 +555,18 @@ export default function SettingsPage() {
                 <p className="text-[11px] text-ink-soft mt-1.5">
                   Default: 2.0 (Double pay for holiday overtime hours worked).
                 </p>
+              </div>
+
+              <div className="rounded-xl border border-line bg-slate-bg/50 p-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-ink">Holidays</h4>
+                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[150px_1fr_auto]">
+                  <input type="date" value={holidayDate} onChange={(e) => setHolidayDate(e.target.value)} className="rounded-lg border border-line bg-panel-bg px-3 py-2 text-xs text-ink" />
+                  <input value={holidayName} onChange={(e) => setHolidayName(e.target.value)} placeholder="Holiday name" className="rounded-lg border border-line bg-panel-bg px-3 py-2 text-xs text-ink" />
+                  <button type="button" disabled={!holidayDate || !holidayName.trim()} onClick={async () => { const created = await dataLayer.addHoliday({ id: "", date: holidayDate, name: holidayName.trim() }); setHolidays([...holidays, created].sort((a, b) => a.date.localeCompare(b.date))); setHolidayDate(""); setHolidayName(""); }} className="rounded-lg bg-amber px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">Add</button>
+                </div>
+                <div className="mt-3 flex flex-col gap-2">
+                  {holidays.length === 0 ? <p className="text-xs text-ink-soft">No holidays configured.</p> : holidays.map((holiday) => <div key={holiday.id} className="flex items-center justify-between rounded-lg border border-line bg-panel-bg px-3 py-2 text-xs"><span className="text-ink"><strong>{holiday.date}</strong> · {holiday.name}</span><button type="button" onClick={async () => { await dataLayer.removeHoliday(holiday.id); setHolidays(holidays.filter((item) => item.id !== holiday.id)); }} className="text-danger hover:underline">Remove</button></div>)}
+                </div>
               </div>
 
               <div className="p-4 border border-line rounded-xl bg-slate-bg/50 space-y-2">
