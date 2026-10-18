@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ShieldCheck, Lock, User, AlertCircle, Loader2, Info } from "lucide-react";
+import { Lock, User, AlertCircle, Loader2, Info } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
@@ -56,47 +56,49 @@ function LoginForm() {
 
   return (
     <div
-      className="min-h-screen bg-slate-bg bg-cover bg-center bg-fixed flex flex-col justify-center items-center p-4 relative"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#121317] bg-cover bg-center bg-fixed p-4 text-[#E9ECEF]"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(7, 19, 29, 0.68), rgba(7, 19, 29, 0.78)), url(https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312469/Cinematic_Teal-Orange_Machine_Shop_un1pjv.png)",
+          "linear-gradient(rgba(9, 14, 19, 0.7), rgba(9, 14, 19, 0.82)), url(https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312469/Cinematic_Teal-Orange_Machine_Shop_un1pjv.png)",
       }}
     >
-      {/* Container */}
-      <div className="w-full max-w-md bg-panel-bg border border-line rounded-2xl shadow-xl overflow-hidden relative z-10">
-        {/* Header Block */}
-        <div className="bg-ink p-8 text-center text-white relative">
-          <div className="w-14 h-14 bg-amber/20 border border-amber/40 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
-            <ShieldCheck className="w-8 h-8 text-amber" />
-          </div>
-          <h1 className="text-2xl font-bold font-display tracking-tight text-paper">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(94, 234, 212, 0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(94, 234, 212, 0.45) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+        }}
+      />
+
+      <div className="relative z-10 w-full max-w-[510px] overflow-hidden rounded-[24px] border border-[#FB5607]/45 bg-[rgba(18,19,23,0.92)] p-6 shadow-[0_0_40px_rgba(251,86,7,0.18),0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:p-9">
+        <div className="text-center">
+          <img
+            src="https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312496/SRI_MUGAMBIGAI_Industries_Tech_Logo_ozoude.png"
+            alt="Sri Mugambigai Industries logo"
+            className="mx-auto h-auto w-[260px] max-w-full object-contain"
+          />
+          <h1 className="mt-5 font-display text-3xl font-bold tracking-tight text-[#E9ECEF]">
             SMI ERP
           </h1>
-          <p className="text-xs text-[#a0aabf] mt-1 font-sans">
+          <p className="mt-2 text-sm text-[#8b8fa3]">
             Enterprise Industrial Operations Dashboard
           </p>
         </div>
 
-        {/* Form Body */}
-        <div className="p-8 space-y-6">
-          <div className="flex justify-center rounded-xl border border-line bg-white p-3 shadow-sm">
-            <img
-              src="https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312496/SRI_MUGAMBIGAI_Industries_Tech_Logo_ozoude.png"
-              alt="Sri Mugambigai Industries and Tech logo"
-              className="h-auto max-h-24 w-full object-contain"
-            />
-          </div>
+        <div className="mt-8 space-y-6">
 
           {/* Notifications */}
           {infoMsg && (
-            <div className="p-3 bg-amber-soft/60 border border-amber/30 rounded-xl flex items-start gap-2.5 text-xs text-ink">
+            <div className="flex items-start gap-2.5 rounded-xl border border-[#FB5607]/30 bg-[#211b18] p-3 text-xs text-[#E9ECEF]">
               <Info className="w-4 h-4 text-amber shrink-0 mt-0.5" />
               <span>{infoMsg}</span>
             </div>
           )}
 
           {errorMsg && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2.5 text-xs text-danger">
+            <div className="flex items-start gap-2.5 rounded-xl border border-red-400/30 bg-red-950/30 p-3 text-xs text-red-200">
               <AlertCircle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
               <span>{errorMsg}</span>
             </div>
@@ -105,11 +107,11 @@ function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             {/* Username Field */}
             <div className="space-y-1.5">
-              <label htmlFor="username" className="font-semibold text-ink block">
+              <label htmlFor="username" className="block font-sans text-sm font-semibold text-[#E9ECEF]">
                 Username
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-ink-soft absolute left-3 top-1/2 -translate-y-1/2" />
+                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8b8fa3]" />
                 <input
                   id="username"
                   type="text"
@@ -118,18 +120,18 @@ function LoginForm() {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter username"
                   disabled={loading}
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-bg/50 border border-line rounded-lg text-ink font-medium focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber transition-colors disabled:opacity-50"
+                  className="h-12 w-full rounded-xl border border-[#2a2d38] bg-[#171920] pl-9 pr-3 font-sans text-sm font-medium text-[#E9ECEF] placeholder:text-[#8b8fa3] transition-colors focus:border-[#FB5607] focus:outline-none focus:ring-2 focus:ring-[#FB5607]/25 disabled:opacity-50"
                 />
               </div>
             </div>
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <label htmlFor="password" className="font-semibold text-ink block">
+              <label htmlFor="password" className="block font-sans text-sm font-semibold text-[#E9ECEF]">
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-ink-soft absolute left-3 top-1/2 -translate-y-1/2" />
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8b8fa3]" />
                 <input
                   id="password"
                   type="password"
@@ -138,7 +140,7 @@ function LoginForm() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter password"
                   disabled={loading}
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-bg/50 border border-line rounded-lg text-ink font-medium focus:outline-none focus:border-amber focus:ring-1 focus:ring-amber transition-colors disabled:opacity-50"
+                  className="h-12 w-full rounded-xl border border-[#2a2d38] bg-[#171920] pl-9 pr-3 font-sans text-sm font-medium text-[#E9ECEF] placeholder:text-[#8b8fa3] transition-colors focus:border-[#FB5607] focus:outline-none focus:ring-2 focus:ring-[#FB5607]/25 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -147,7 +149,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-amber text-white font-semibold rounded-lg text-xs hover:bg-amber/90 focus:outline-none focus:ring-2 focus:ring-amber/50 disabled:opacity-60 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer mt-2"
+              className="mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#FB5607] px-4 text-sm font-semibold text-white shadow-[0_0_22px_rgba(251,86,7,0.22)] transition-all hover:bg-[#ff6b26] hover:shadow-[0_0_28px_rgba(251,86,7,0.32)] focus:outline-none focus:ring-2 focus:ring-[#FB5607]/50 disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -161,15 +163,15 @@ function LoginForm() {
           </form>
 
           {/* Demo Hint Banner */}
-          <div className="p-3 bg-slate-bg border border-line rounded-xl text-[11px] text-ink-soft text-center leading-relaxed">
-            <span className="font-semibold text-ink">Demo Credentials:</span>{" "}
-            <code className="bg-panel-bg px-1.5 py-0.5 rounded border border-line font-mono text-ink">admin</code> /{" "}
-            <code className="bg-panel-bg px-1.5 py-0.5 rounded border border-line font-mono text-ink">Demo@12345</code>
+          <div className="rounded-xl border border-[#2a2d38] bg-[#171920] p-3 text-center text-[11px] leading-relaxed text-[#8b8fa3]">
+            <span className="font-semibold text-[#E9ECEF]">Demo Credentials:</span>{" "}
+            <code className="rounded border border-[#2a2d38] bg-[#21232c] px-1.5 py-0.5 font-mono text-[#E9ECEF]">admin</code> /{" "}
+            <code className="rounded border border-[#2a2d38] bg-[#21232c] px-1.5 py-0.5 font-mono text-[#E9ECEF]">Demo@12345</code>
           </div>
         </div>
       </div>
 
-      <p className="text-[11px] text-ink-soft mt-6 text-center">
+      <p className="absolute bottom-4 left-0 right-0 z-10 px-4 text-center text-[11px] text-[#8b8fa3]">
         Protected system • SMI Industrial ERP • Production Build v1.0
       </p>
     </div>
@@ -178,7 +180,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-bg flex items-center justify-center text-xs text-ink-soft">Loading authentication...</div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#121317] text-xs text-[#8b8fa3]">Loading authentication...</div>}>
       <LoginForm />
     </Suspense>
   );
