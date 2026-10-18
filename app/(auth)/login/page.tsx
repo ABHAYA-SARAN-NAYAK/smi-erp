@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ShieldCheck, Lock, User, AlertCircle, Loader2, Info } from "lucide-react";
 
@@ -11,15 +11,12 @@ function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [infoMsg, setInfoMsg] = useState<string | null>(null);
+  const [infoMsg, setInfoMsg] = useState<string | null>(() =>
+    searchParams.get("reason") === "expired"
+      ? "Your session has expired. Please log in again to continue."
+      : null
+  );
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const reason = searchParams.get("reason");
-    if (reason === "expired") {
-      setInfoMsg("Your session has expired. Please log in again to continue.");
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +48,7 @@ function LoginForm() {
       // Success -> Redirect to Home Dashboard
       router.push("/home");
       router.refresh();
-    } catch (err) {
+    } catch {
       setErrorMsg("Unable to connect to the authentication service. Please check your network.");
       setLoading(false);
     }

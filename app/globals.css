@@ -29,6 +29,16 @@
   --color-info: #3b82f6;
   --color-warning: #f59e0b;
 
+  /* Invoice paper tokens used by the print preview */
+  --color-paper: #fffdf8;
+  --color-ink: #1f2937;
+  --color-ink-soft: #64748b;
+  --color-amber: #c2410c;
+  --color-amber-soft: #fff7ed;
+  --color-slate-bg: #f8fafc;
+  --color-panel-bg: #1a1c23;
+  --color-line: #cbd5e1;
+
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
