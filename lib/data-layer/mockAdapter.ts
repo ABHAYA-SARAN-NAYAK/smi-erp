@@ -101,8 +101,23 @@ export class MockDataAdapter implements DataLayer {
     this.jobWorkRows = this.loadFromStorage(STORAGE_KEYS.JOB_WORK, initialJobWork as JobWorkRow[]);
     this.attendanceEntries = this.loadFromStorage(STORAGE_KEYS.ATTENDANCE, initialAttendance as AttendanceEntry[]);
     const storedSettings = this.loadFromStorage(STORAGE_KEYS.SETTINGS, initialSettings as Settings);
+    const defaultSettings = initialSettings as Settings;
+    const hasLegacyDemoDefaults =
+      storedSettings.companyName === "Demo Industries Pvt Ltd" ||
+      storedSettings.companyAddress === "12 Sample Street, Demo City 600000" ||
+      storedSettings.companyGST === "33AAAAA0000A1Z0";
     this.settings = {
       ...storedSettings,
+      ...(hasLegacyDemoDefaults
+        ? {
+            companyName: defaultSettings.companyName,
+            companyAddress: defaultSettings.companyAddress,
+            companyPhone: defaultSettings.companyPhone,
+            companyGST: defaultSettings.companyGST,
+            companyState: defaultSettings.companyState,
+            logoUrl: defaultSettings.logoUrl,
+          }
+        : {}),
       logoUrl: storedSettings.logoUrl || DEFAULT_INVOICE_LOGO_URL,
     };
     this.holidays = this.loadFromStorage(STORAGE_KEYS.HOLIDAYS, [] as Holiday[]);

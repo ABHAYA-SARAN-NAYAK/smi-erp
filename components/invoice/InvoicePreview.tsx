@@ -61,7 +61,7 @@ export function InvoicePreview({
           />
           <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
-            {settings?.companyName || "SMI Industrial Components"}
+{settings?.companyName || "SRI MUGAMBIGAI INDUSTRIES"}
           </h1>
           <p className="text-ink-soft text-[11px] mt-1 max-w-sm">
             {settings?.companyAddress || "Plot 12, Industrial Estate, Peenya, Bangalore"}
@@ -69,7 +69,9 @@ export function InvoicePreview({
           <div className="mt-2 text-[11px] text-ink-soft space-x-3">
             <span><strong>GSTIN:</strong> {settings?.companyGST || "29AACFA1234B1Z5"}</span>
             <span>•</span>
-            <span><strong>Ph:</strong> {settings?.companyPhone || "9999999999"}</span>
+            <span><strong>Ph:</strong> {settings?.companyPhone || "73059 53772 / 97890 79562"}</span>
+            <span>•</span>
+            <span><strong>State:</strong> {settings?.companyState || "Tamil Nadu"}</span>
           </div>
           </div>
         </div>
