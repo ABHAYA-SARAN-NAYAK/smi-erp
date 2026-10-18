@@ -14,7 +14,13 @@ export async function downloadInvoicePdf(
     throw new Error(`Element #${elementId} not found for PDF export.`);
   }
 
-  // Temporary scale adjustment for crisp high-DPI rendering
+  const stage = element.closest<HTMLElement>(".invoice-preview-stage, .salary-slip-preview-stage");
+  const shell = stage?.parentElement;
+  const previousTransform = stage?.style.transform;
+  const previousShellHeight = shell?.style.height;
+  if (stage) stage.style.transform = "scale(1)";
+  if (shell) shell.style.height = `${element.scrollHeight}px`;
+
   const canvas = await html2canvas(element, {
     scale: 2,
     useCORS: true,
@@ -62,4 +68,6 @@ export async function downloadInvoicePdf(
   }
 
   pdf.save(filename.endsWith(".pdf") ? filename : `${filename}.pdf`);
+  if (stage) stage.style.transform = previousTransform || "";
+  if (shell) shell.style.height = previousShellHeight || "";
 }

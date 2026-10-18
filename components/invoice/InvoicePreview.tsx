@@ -1,225 +1,74 @@
 "use client";
 
-import React from "react";
-import { InvoiceItem } from "@/lib/data-layer/types";
-import { Settings, Company } from "@/lib/data-layer/types";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { InvoiceItem, Settings, Company } from "@/lib/data-layer/types";
 import { DEFAULT_INVOICE_LOGO_URL } from "@/lib/data-layer/mockAdapter";
+import { addDateOnlyDays, formatInvoiceDate, splitPhoneNumbers } from "@/lib/formatters/invoice";
 
 interface InvoicePreviewProps {
-  invoiceNo: string;
-  date: string;
-  type: "With Tax" | "Without Tax";
-  poNo?: string;
-  company?: Company | null;
-  items: InvoiceItem[];
-  cgstPercent: number;
-  sgstPercent: number;
-  settings?: Settings | null;
+  invoiceNo: string; date: string; type: "With Tax" | "Without Tax"; poNo?: string;
+  company?: Company | null; items: InvoiceItem[]; cgstPercent: number; sgstPercent: number; settings?: Settings | null;
 }
 
-export function InvoicePreview({
-  invoiceNo,
-  date,
-  type,
-  poNo,
-  company,
-  items,
-  cgstPercent,
-  sgstPercent,
-  settings,
-}: InvoicePreviewProps) {
+export function InvoicePreview(props: InvoicePreviewProps) {
+  const { invoiceNo, date, type, poNo, company, items, cgstPercent, sgstPercent, settings } = props;
+  const shellRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
   const taxableAmount = items.reduce((sum, item) => sum + (item.amount || 0), 0);
   const isWithTax = type === "With Tax";
-
   const cgstAmount = isWithTax ? (taxableAmount * cgstPercent) / 100 : 0;
   const sgstAmount = isWithTax ? (taxableAmount * sgstPercent) / 100 : 0;
   const grandTotal = Math.round(taxableAmount + cgstAmount + sgstAmount);
+  const dueDate = useMemo(() => company ? addDateOnlyDays(date, company.creditDays || 30) : date, [company, date]);
+  const phones = splitPhoneNumbers(settings?.companyPhone);
 
-  // Auto-calculated due date based on company credit days
-  const dueDate = company
-    ? (() => {
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return date;
-        d.setDate(d.getDate() + (company.creditDays || 30));
-        return d.toISOString().split("T")[0];
-      })()
-    : date;
+  useEffect(() => {
+    const element = shellRef.current;
+    if (!element) return;
+    const update = () => setScale(Math.min(1, element.clientWidth / 794));
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div
-      id="invoice-paper-preview"
-      className="bg-paper border border-line rounded-2xl p-8 shadow-lg text-ink space-y-6 text-xs max-w-2xl mx-auto transition-all"
-      style={{ backgroundColor: "#fffdf8" }} // PRD §5 --paper
-    >
-      {/* ── Document Header ── */}
-      <div className="border-b border-line pb-5 flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <img
-            src={settings?.logoUrl || DEFAULT_INVOICE_LOGO_URL}
-            alt="Company logo"
-            className="h-14 w-20 shrink-0 object-contain"
-          />
-          <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
-{settings?.companyName || "SRI MUGAMBIGAI INDUSTRIES"}
-          </h1>
-          <p className="text-ink-soft text-[11px] mt-1 max-w-sm">
-            {settings?.companyAddress || "Plot 12, Industrial Estate, Peenya, Bangalore"}
-          </p>
-          <div className="mt-2 text-[11px] text-ink-soft space-x-3">
-            <span><strong>GSTIN:</strong> {settings?.companyGST || "29AACFA1234B1Z5"}</span>
-            <span>•</span>
-            <span><strong>Ph:</strong> {settings?.companyPhone || "73059 53772 / 97890 79562"}</span>
-            <span>•</span>
-            <span><strong>State:</strong> {settings?.companyState || "Tamil Nadu"}</span>
-          </div>
-          </div>
-        </div>
-
-        <div className="text-right">
-          <div className="inline-block px-3 py-1 bg-amber-soft text-amber font-semibold uppercase tracking-wider rounded-md text-[10px] mb-2 border border-amber/30">
-            {type === "With Tax" ? "TAX INVOICE" : "DELIVERY CHALLAN / BILL"}
-          </div>
-          <div className="font-display font-bold text-lg text-ink tabular-nums">
-            #{invoiceNo || "INV-1001"}
-          </div>
-          <div className="text-ink-soft text-[11px] mt-1">
-            <strong>Date:</strong> {date || "YYYY-MM-DD"}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Bill To & Details Block ── */}
-      <div className="grid grid-cols-2 gap-4 p-4 bg-slate-bg/40 rounded-xl border border-line">
-        <div>
-          <h4 className="font-semibold text-ink-soft uppercase text-[10px] tracking-wider mb-1">
-            Billed To / Recipient
-          </h4>
-          {company ? (
-            <div>
-              <div className="font-bold text-ink text-sm font-display">{company.name}</div>
-              <div className="text-[11px] text-ink-soft mt-0.5">{company.address}</div>
-              <div className="text-[11px] text-ink-soft mt-1">
-                <strong>GSTIN:</strong> {company.gstNo}
-              </div>
-              <div className="text-[11px] text-ink-soft">
-                <strong>State:</strong> {company.state}
+    <div ref={shellRef} className="invoice-preview-shell" style={{ height: 1123 * scale }}>
+      <div className="invoice-preview-stage" style={{ width: 794, height: 1123, transform: `scale(${scale})` }}>
+        <div id="invoice-paper-preview" className="invoice-document" style={{ backgroundColor: "#fffdf8" }}>
+          <header className="invoice-document-header">
+            {settings?.logoUrl || DEFAULT_INVOICE_LOGO_URL ? <img src={settings?.logoUrl || DEFAULT_INVOICE_LOGO_URL} alt="Company logo" className="invoice-logo" /> : null}
+            <div className="invoice-company-block">
+              <h1>{settings?.companyName || "SRI MUGAMBIGAI INDUSTRIES"}</h1>
+              <p>{settings?.companyAddress || "No. 116, Perumal Nagar, Tirumudivakkam, Chennai – 600044"}</p>
+              <div className="invoice-contact-grid">
+                <span><b>GSTIN:</b> {settings?.companyGST || "—"}</span>
+                <span><b>State:</b> {settings?.companyState || "Tamil Nadu"}</span>
+                <span className="invoice-phone-list"><b>Ph:</b> {phones.map((phone, index) => <React.Fragment key={phone}><span>{phone}</span>{index < phones.length - 1 ? <span>/</span> : null}</React.Fragment>)}</span>
               </div>
             </div>
-          ) : (
-            <div className="text-ink-soft italic text-[11px]">Select a company...</div>
-          )}
-        </div>
-
-        <div className="text-right space-y-1 text-[11px]">
-          <div>
-            <span className="text-ink-soft font-medium">P.O. Number:</span>{" "}
-            <span className="font-semibold text-ink">{poNo || "N/A"}</span>
-          </div>
-          <div>
-            <span className="text-ink-soft font-medium">Credit Term:</span>{" "}
-            <span className="font-semibold text-ink">
-              {company?.creditDays || 30} Days
-            </span>
-          </div>
-          <div>
-            <span className="text-ink-soft font-medium">Payment Due Date:</span>{" "}
-            <span className="font-semibold text-amber">{dueDate}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Line Items Table ── */}
-      <div className="border border-line rounded-xl overflow-hidden">
-        <table className="w-full text-left border-collapse text-xs">
-          <thead className="bg-slate-bg border-b border-line text-ink-soft font-semibold text-[10px] uppercase">
-            <tr>
-              <th className="py-2.5 px-3 w-10 text-center">#</th>
-              <th className="py-2.5 px-3">Part No</th>
-              <th className="py-2.5 px-3">Particulars / Description</th>
-              <th className="py-2.5 px-3 text-center">HSN</th>
-              <th className="py-2.5 px-3 text-right">Qty</th>
-              <th className="py-2.5 px-3 text-right">Rate (₹)</th>
-              <th className="py-2.5 px-3 text-right">Amount (₹)</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-line bg-paper">
-            {items.length > 0 ? (
-              items.map((item, index) => (
-                <tr key={index}>
-                  <td className="py-2.5 px-3 text-center text-ink-soft">{index + 1}</td>
-                  <td className="py-2.5 px-3 font-mono font-medium text-ink">{item.partNo}</td>
-                  <td className="py-2.5 px-3 font-medium text-ink">{item.particulars}</td>
-                  <td className="py-2.5 px-3 text-center font-mono text-ink-soft">{item.hsn}</td>
-                  <td className="py-2.5 px-3 text-right tabular-nums font-medium">{item.qty}</td>
-                  <td className="py-2.5 px-3 text-right tabular-nums font-medium">
-                    ₹{item.rate.toLocaleString("en-IN")}
-                  </td>
-                  <td className="py-2.5 px-3 text-right tabular-nums font-semibold text-ink">
-                    ₹{item.amount.toLocaleString("en-IN")}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="py-6 text-center text-ink-soft italic">
-                  No items added yet. Use the product picker or add custom rows.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ── Summary & Tax Breakdown Block ── */}
-      <div className="flex justify-end pt-2">
-        <div className="w-64 space-y-2 text-xs border-t border-line pt-3">
-          <div className="flex justify-between text-ink-soft">
-            <span>Subtotal (Taxable):</span>
-            <span className="font-semibold text-ink tabular-nums">
-              ₹{taxableAmount.toLocaleString("en-IN")}
-            </span>
-          </div>
-
-          {isWithTax && (
-            <>
-              <div className="flex justify-between text-ink-soft">
-                <span>CGST ({cgstPercent}%):</span>
-                <span className="font-medium text-ink tabular-nums">
-                  ₹{cgstAmount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                </span>
-              </div>
-              <div className="flex justify-between text-ink-soft">
-                <span>SGST ({sgstPercent}%):</span>
-                <span className="font-medium text-ink tabular-nums">
-                  ₹{sgstAmount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
-                </span>
-              </div>
-            </>
-          )}
-
-          <div className="flex justify-between pt-2 border-t border-line font-display text-sm font-bold text-ink">
-            <span>Grand Total:</span>
-            <span className="text-amber tabular-nums">
-              ₹{grandTotal.toLocaleString("en-IN")}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Footer Terms ── */}
-      <div className="border-t border-line pt-4 text-[10px] text-ink-soft flex items-center justify-between">
-        <div>
-          <p className="font-semibold text-ink">Terms &amp; Conditions:</p>
-          <p>1. Payment due within credit terms specified above.</p>
-          <p>2. Goods once sold will not be taken back unless defective.</p>
-        </div>
-        <div className="text-right">
-          <p className="font-display font-semibold text-ink">
-            For {settings?.companyName || "SMI Industrial Components"}
-          </p>
-          <div className="h-8" />
-          <p className="border-t border-line/60 pt-1">Authorized Signatory</p>
+            <div className="invoice-doc-meta">
+              <div className="invoice-badge">{isWithTax ? "TAX INVOICE" : "INVOICE"}</div>
+              <div className="invoice-number">#{invoiceNo || "INV-1001"}</div>
+              <div>Date: {formatInvoiceDate(date)}</div>
+            </div>
+          </header>
+          <section className="invoice-billed-block">
+            <div>
+              <h4>BILLED TO / RECIPIENT</h4>
+              {company ? <><strong>{company.name}</strong><p>{company.address}</p><span><b>GSTIN:</b> {company.gstNo}</span><span><b>State:</b> {company.state}</span></> : <em>Select a company...</em>}
+            </div>
+            <div className="invoice-meta-grid">
+              <span>P.O. Number:</span><strong>{poNo || "—"}</strong>
+              <span>Credit Term:</span><strong>{company?.creditDays || 30} Days</strong>
+              <span>Payment Due Date:</span><strong className="invoice-accent">{formatInvoiceDate(dueDate)}</strong>
+            </div>
+          </section>
+          <section className="invoice-table-wrap">
+            <table className="invoice-items-table"><colgroup><col className="col-no" /><col className="col-part" /><col className="col-desc" /><col className="col-hsn" /><col className="col-qty" /><col className="col-rate" /><col className="col-amount" /></colgroup><thead><tr><th>#</th><th>Part No</th><th>Particulars / Description</th><th>HSN</th><th>Qty</th><th>Rate (₹)</th><th>Amount (₹)</th></tr></thead><tbody>{items.length ? items.map((item, index) => <tr key={`${item.partNo}-${index}`}><td>{index + 1}</td><td className="nowrap mono">{item.partNo}</td><td>{item.particulars}</td><td className="nowrap mono">{item.hsn}</td><td className="num nowrap">{item.qty}</td><td className="num nowrap">₹{item.rate.toLocaleString("en-IN")}</td><td className="num nowrap"><b>₹{item.amount.toLocaleString("en-IN")}</b></td></tr>) : <tr><td colSpan={7} className="empty-row">No items added yet.</td></tr>}</tbody></table>
+          </section>
+          <div className="invoice-summary"><div><span>Subtotal (Taxable):</span><b>₹{taxableAmount.toLocaleString("en-IN")}</b>{isWithTax && <><span>CGST ({cgstPercent}%):</span><b>₹{cgstAmount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</b><span>SGST ({sgstPercent}%):</span><b>₹{sgstAmount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</b></>}<strong>Grand Total:</strong><strong className="invoice-accent">₹{grandTotal.toLocaleString("en-IN")}</strong></div></div>
+          <footer className="invoice-footer"><div><b>Terms &amp; Conditions:</b><span>1. Payment due within credit terms specified above.</span><span>2. Goods once sold will not be taken back unless defective.</span></div><div className="signature"><b>For {settings?.companyName || "SRI MUGAMBIGAI INDUSTRIES"}</b><div /><span>Authorized Signatory</span></div></footer>
         </div>
       </div>
     </div>
