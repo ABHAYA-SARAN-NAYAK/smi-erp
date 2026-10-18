@@ -26,6 +26,9 @@ import initialJobWork from "../../data/mock-job-work.json";
 import initialAttendance from "../../data/mock-attendance.json";
 import initialSettings from "../../data/mock-settings.json";
 
+export const DEFAULT_INVOICE_LOGO_URL =
+  "https://res.cloudinary.com/dkht5j3tw/image/upload/v1792314158/Teal_Interlocking_Hexagonal_Emblem_wyk0nz.png";
+
 const STORAGE_KEYS = {
   COMPANIES: "smi_companies",
   PRODUCTS: "smi_products",
@@ -84,7 +87,11 @@ export class MockDataAdapter implements DataLayer {
     this.gstRows = this.loadFromStorage(STORAGE_KEYS.GST, initialGst as GstRow[]);
     this.jobWorkRows = this.loadFromStorage(STORAGE_KEYS.JOB_WORK, initialJobWork as JobWorkRow[]);
     this.attendanceEntries = this.loadFromStorage(STORAGE_KEYS.ATTENDANCE, initialAttendance as AttendanceEntry[]);
-    this.settings = this.loadFromStorage(STORAGE_KEYS.SETTINGS, initialSettings as Settings);
+    const storedSettings = this.loadFromStorage(STORAGE_KEYS.SETTINGS, initialSettings as Settings);
+    this.settings = {
+      ...storedSettings,
+      logoUrl: storedSettings.logoUrl || DEFAULT_INVOICE_LOGO_URL,
+    };
   }
 
   private loadFromStorage<T>(key: string, defaultValue: T): T {

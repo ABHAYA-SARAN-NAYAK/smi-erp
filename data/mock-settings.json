@@ -4,6 +4,7 @@
   "companyPhone": "9999999999",
   "companyGST": "33AAAAA0000A1Z0",
   "companyState": "Tamil Nadu",
+  "logoUrl": "https://res.cloudinary.com/dkht5j3tw/image/upload/v1792314158/Teal_Interlocking_Hexagonal_Emblem_wyk0nz.png",
   "invoicePrefix": "INV-",
   "lastInvoiceNo": 1000,
   "defaultCgstPercent": 9,

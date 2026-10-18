@@ -3,6 +3,7 @@
 import React from "react";
 import { InvoiceItem } from "@/lib/data-layer/types";
 import { Settings, Company } from "@/lib/data-layer/types";
+import { DEFAULT_INVOICE_LOGO_URL } from "@/lib/data-layer/mockAdapter";
 
 interface InvoicePreviewProps {
   invoiceNo: string;
@@ -53,13 +54,11 @@ export function InvoicePreview({
       {/* ── Document Header ── */}
       <div className="border-b border-line pb-5 flex items-start justify-between">
         <div className="flex items-start gap-3">
-          {settings?.logoUrl ? (
-            <img
-              src={settings.logoUrl}
-              alt="Company logo"
-              className="h-14 w-20 shrink-0 object-contain"
-            />
-          ) : null}
+          <img
+            src={settings?.logoUrl || DEFAULT_INVOICE_LOGO_URL}
+            alt="Company logo"
+            className="h-14 w-20 shrink-0 object-contain"
+          />
           <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
             {settings?.companyName || "SMI Industrial Components"}
