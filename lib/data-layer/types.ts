@@ -182,6 +182,8 @@ export interface PayrollRow {
   month: string; // e.g. "Sep-2026"
   totalDaysPresent: number;
   totalHours: number;
+  paidOffDays?: number;
+  hourlyRate?: number;
   otHours: number;
   holidayOtHours: number;
   baseSalary: number;
@@ -204,4 +206,6 @@ export interface Settings {
   defaultCgstPercent: number;
   defaultSgstPercent: number;
   holidayOtMultiplier: number;
+  standardShiftHours?: number;
+  payMonthlyOffsAndHolidays?: boolean;
 }

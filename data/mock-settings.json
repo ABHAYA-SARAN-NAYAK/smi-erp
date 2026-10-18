@@ -9,5 +9,7 @@
   "lastInvoiceNo": 1000,
   "defaultCgstPercent": 9,
   "defaultSgstPercent": 9,
-  "holidayOtMultiplier": 2
+  "holidayOtMultiplier": 2,
+  "standardShiftHours": 8,
+  "payMonthlyOffsAndHolidays": true
 }

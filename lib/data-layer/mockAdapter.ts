@@ -29,6 +29,7 @@ import initialBalance from "../../data/mock-balance-confirmation.json";
 import initialGst from "../../data/mock-gst-summary.json";
 import initialJobWork from "../../data/mock-job-work.json";
 import initialAttendance from "../../data/mock-attendance.json";
+import { computeEmployeeMonth } from "@/lib/payroll/calculations";
 import initialSettings from "../../data/mock-settings.json";
 
 export const DEFAULT_INVOICE_LOGO_URL =
@@ -411,7 +412,7 @@ export class MockDataAdapter implements DataLayer {
     return { ...row };
   }
 
-  // ── GST Summary ───────────────────────────────────────────
+  // ── GST Summary ────────────���──────────────────────────────
   async getGstSummary(month: string): Promise<GstRow[]> {
     return this.gstRows.filter((g) => g.month === month);
   }
@@ -615,63 +616,7 @@ export class MockDataAdapter implements DataLayer {
   }
 
   async getMonthlyPayroll(month: string): Promise<PayrollRow[]> {
-    const result: PayrollRow[] = [];
-    const multiplier = this.settings.holidayOtMultiplier || 2;
-
-    for (const emp of this.employees) {
-      const empEntries = this.attendanceEntries.filter((a) => {
-        const mKey = getMonthKey(a.date);
-        return a.employeeId === emp.id && mKey === month;
-      });
-
-      const totalDaysPresent = empEntries.filter((e) => e.status === "Present").length;
-      const otHours = empEntries.reduce((sum, e) => sum + (e.otHours || 0), 0);
-      const holidayOtHours = empEntries.reduce((sum, e) => sum + (e.holidayOtHours || 0), 0);
-      const totalAdvances = empEntries.reduce((sum, e) => sum + (e.advance || 0), 0);
-
-      let baseSalary = 0;
-      let otPay = 0;
-      let holidayOtPay = 0;
-      let totalHours = totalDaysPresent * 8 + otHours + holidayOtHours;
-
-      if (emp.salaryType === "Monthly") {
-        baseSalary = emp.rate;
-        const hourlyRate = emp.rate / (26 * 8); // 26 working days * 8 hours
-        otPay = otHours * hourlyRate;
-        holidayOtPay = holidayOtHours * hourlyRate * multiplier;
-      } else if (emp.salaryType === "Daily") {
-        baseSalary = totalDaysPresent * emp.rate;
-        const hourlyRate = emp.rate / 8;
-        otPay = otHours * hourlyRate;
-        holidayOtPay = holidayOtHours * hourlyRate * multiplier;
-      } else if (emp.salaryType === "Hourly") {
-        baseSalary = totalDaysPresent * 8 * emp.rate;
-        otPay = otHours * emp.rate;
-        holidayOtPay = holidayOtHours * emp.rate * multiplier;
-      }
-
-      const totalSalary = Math.round(baseSalary + otPay + holidayOtPay);
-      const netPayable = Math.max(0, totalSalary - totalAdvances);
-
-      result.push({
-        employeeId: emp.id,
-        employeeName: emp.name,
-        designation: emp.designation,
-        month,
-        totalDaysPresent,
-        totalHours,
-        otHours,
-        holidayOtHours,
-        baseSalary: Math.round(baseSalary),
-        otPay: Math.round(otPay),
-        holidayOtPay: Math.round(holidayOtPay),
-        totalSalary,
-        totalAdvances,
-        netPayable,
-      });
-    }
-
-    return result;
+    return this.employees.map((employee) => computeEmployeeMonth(employee, month, this.attendanceEntries, this.settings, this.holidays));
   }
 
   // ── Settings ──────────────────────────────────────────────

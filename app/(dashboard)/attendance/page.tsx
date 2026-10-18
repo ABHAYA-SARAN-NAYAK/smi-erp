@@ -101,8 +101,8 @@ export default function AttendancePage() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    void loadData();
+  }, [selectedMonth]);
 
   const openEmployeePanel = (employee?: Employee) => {
     setEditingEmployeeId(employee?.id ?? null);
