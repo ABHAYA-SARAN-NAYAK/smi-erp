@@ -55,9 +55,15 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-bg flex flex-col justify-center items-center p-4">
+    <div
+      className="min-h-screen bg-slate-bg bg-cover bg-center bg-fixed flex flex-col justify-center items-center p-4 relative"
+      style={{
+        backgroundImage:
+          "linear-gradient(rgba(7, 19, 29, 0.68), rgba(7, 19, 29, 0.78)), url(https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312469/Cinematic_Teal-Orange_Machine_Shop_un1pjv.png)",
+      }}
+    >
       {/* Container */}
-      <div className="w-full max-w-md bg-panel-bg border border-line rounded-2xl shadow-xl overflow-hidden">
+      <div className="w-full max-w-md bg-panel-bg border border-line rounded-2xl shadow-xl overflow-hidden relative z-10">
         {/* Header Block */}
         <div className="bg-ink p-8 text-center text-white relative">
           <div className="w-14 h-14 bg-amber/20 border border-amber/40 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
@@ -73,6 +79,14 @@ function LoginForm() {
 
         {/* Form Body */}
         <div className="p-8 space-y-6">
+          <div className="flex justify-center rounded-xl border border-line bg-white p-3 shadow-sm">
+            <img
+              src="https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312496/SRI_MUGAMBIGAI_Industries_Tech_Logo_ozoude.png"
+              alt="Sri Mugambigai Industries and Tech logo"
+              className="h-auto max-h-24 w-full object-contain"
+            />
+          </div>
+
           {/* Notifications */}
           {infoMsg && (
             <div className="p-3 bg-amber-soft/60 border border-amber/30 rounded-xl flex items-start gap-2.5 text-xs text-ink">
