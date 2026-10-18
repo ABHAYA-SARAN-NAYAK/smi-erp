@@ -39,17 +39,24 @@ const STORAGE_KEYS = {
 };
 
 // Helper for date math: add days to YYYY-MM-DD
+function parseDateOnly(dateStr: string): Date | null {
+  const match = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(dateStr);
+  if (!match) return null;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 function addDays(dateStr: string, days: number): string {
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
+  const date = parseDateOnly(dateStr);
+  if (!date) return dateStr;
   date.setDate(date.getDate() + days);
-  return date.toISOString().split("T")[0];
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
 // Helper for month formatting: YYYY-MM-DD -> "MMM-YYYY" (e.g. "Sep-2026")
 function getMonthKey(dateStr: string): string {
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "Unknown";
+  const date = parseDateOnly(dateStr);
+  if (!date) return "Unknown";
   const months = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

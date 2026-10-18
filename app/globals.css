@@ -269,6 +269,30 @@
   #invoice-paper-preview .border-line { border-color: #cbd5e1; }
   #invoice-paper-preview .bg-amber-soft { background-color: #fff7ed; }
   #invoice-paper-preview .text-amber { color: #c2410c; }
+  #invoice-paper-preview .text-danger { color: #b91c1c; }
+  #invoice-paper-preview .bg-paper { background-color: #fffdf8; }
+  #invoice-paper-preview .divide-line > :not([hidden]) ~ :not([hidden]) { border-color: #cbd5e1; }
+
+  /* Printable salary slips use a self-contained light palette for screen and PDF output. */
+  #salary-slip-paper {
+    color: #1a1a1a;
+    background-color: #fffdf8;
+    border-color: #cbd5e1;
+  }
+  #salary-slip-paper .text-ink { color: #1a1a1a; }
+  #salary-slip-paper .text-ink-soft { color: #555555; }
+  #salary-slip-paper .text-amber { color: #c2410c; }
+  #salary-slip-paper .text-danger { color: #b91c1c; }
+  #salary-slip-paper .text-success { color: #166534; }
+  #salary-slip-paper .bg-slate-bg,
+  #salary-slip-paper [class~="bg-slate-bg/40"],
+  #salary-slip-paper [class~="bg-slate-bg/50"] { background-color: #f3f1ea; }
+  #salary-slip-paper .bg-amber-soft,
+  #salary-slip-paper [class~="bg-amber-soft/40"] { background-color: #fff1e8; }
+  #salary-slip-paper .border-line { border-color: #cbd5e1; }
+  #salary-slip-paper [class~="border-amber/30"] { border-color: #fdba9a; }
+  #salary-slip-paper [class~="border-line/60"] { border-color: #94a3b8; }
+  #salary-slip-paper .divide-line > :not([hidden]) ~ :not([hidden]) { border-color: #cbd5e1; }
 
   .btn-accent-primary {
     background-color: #FB5607;
