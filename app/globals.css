@@ -30,14 +30,15 @@
   --color-warning: #f59e0b;
 
   /* Invoice paper tokens used by the print preview */
+  /* Shared app tokens stay readable on the dark dashboard surfaces. */
   --color-paper: #fffdf8;
-  --color-ink: #1f2937;
-  --color-ink-soft: #64748b;
-  --color-amber: #c2410c;
-  --color-amber-soft: #fff7ed;
-  --color-slate-bg: #f8fafc;
+  --color-ink: #e9ecef;
+  --color-ink-soft: #8b8fa3;
+  --color-amber: #fb5607;
+  --color-amber-soft: rgba(251, 86, 7, 0.15);
+  --color-slate-bg: #121317;
   --color-panel-bg: #1a1c23;
-  --color-line: #cbd5e1;
+  --color-line: #2a2d38;
 
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -256,6 +257,19 @@
   }
 
   /* Buttons */
+  /* The invoice preview is intentionally a light printed document inside the dark app. */
+  #invoice-paper-preview {
+    color: #1f2937;
+    border-color: #cbd5e1;
+  }
+  #invoice-paper-preview .text-ink { color: #1f2937; }
+  #invoice-paper-preview .text-ink-soft { color: #64748b; }
+  #invoice-paper-preview .bg-slate-bg,
+  #invoice-paper-preview .bg-slate-bg\/40 { background-color: #f8fafc; }
+  #invoice-paper-preview .border-line { border-color: #cbd5e1; }
+  #invoice-paper-preview .bg-amber-soft { background-color: #fff7ed; }
+  #invoice-paper-preview .text-amber { color: #c2410c; }
+
   .btn-accent-primary {
     background-color: #FB5607;
     color: #ffffff;
