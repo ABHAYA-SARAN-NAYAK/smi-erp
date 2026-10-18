@@ -72,6 +72,7 @@ export function InvoicePreview({
             <span>•</span>
             <span><strong>Ph:</strong> {settings?.companyPhone || "9999999999"}</span>
           </div>
+          </div>
         </div>
 
         <div className="text-right">
