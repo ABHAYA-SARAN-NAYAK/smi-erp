@@ -1,11 +1,15 @@
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
 
+function isIdentityTransform(value: string): boolean {
+  return value === "none" || value === "matrix(1, 0, 0, 1, 0, 0)" || value === "matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)";
+}
+
 export function assertUnscaled(pageEl: HTMLElement): void {
   let current: HTMLElement | null = pageEl;
   while (current) {
     const style = getComputedStyle(current);
-    if (style.transform !== "none") throw new Error(`PDF layout check failed: transform found on ${current.className || current.tagName}.`);
+    if (!isIdentityTransform(style.transform)) throw new Error(`PDF layout check failed: transform found on ${current.className || current.tagName}.`);
     if (style.zoom !== "1" && style.zoom !== "normal") throw new Error(`PDF layout check failed: zoom found on ${current.className || current.tagName}.`);
     if (style.scale !== "none" || style.rotate !== "none" || style.translate !== "none") throw new Error(`PDF layout check failed: individual transform found on ${current.className || current.tagName}.`);
     current = current.parentElement;
