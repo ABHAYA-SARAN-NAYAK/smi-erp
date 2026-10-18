@@ -30,6 +30,7 @@ import {
   CheckCircle2,
   XCircle,
   FileText,
+  Eye,
 } from "lucide-react";
 
 export default function AttendancePage() {
@@ -188,6 +189,11 @@ export default function AttendancePage() {
     }
   };
 
+  // Salary Slip preview
+  const handleViewSalarySlip = (payroll: PayrollRow) => {
+    setViewSlipPayroll(payroll);
+  };
+
   // Salary Slip PDF Download
   const handleDownloadSalarySlip = async (payroll: PayrollRow) => {
     setViewSlipPayroll(payroll);
@@ -309,11 +315,13 @@ export default function AttendancePage() {
       width: "120px",
       accessor: (row) => (
         <button
-          onClick={() => handleDownloadSalarySlip(row)}
-          className="px-2.5 py-1 border border-line bg-panel-bg hover:bg-amber hover:text-white hover:border-amber font-semibold rounded text-[11px] transition-colors shadow-xs flex items-center gap-1 ml-auto"
+          type="button"
+          onClick={() => handleViewSalarySlip(row)}
+          aria-label={`Preview salary slip for ${row.employeeName}`}
+          title="Preview salary slip"
+          className="p-2 border border-line bg-panel-bg text-ink hover:bg-amber hover:text-white hover:border-amber rounded-md transition-colors shadow-xs ml-auto"
         >
-          <Download className="w-3 h-3" />
-          Slip PDF
+          <Eye className="w-4 h-4" aria-hidden="true" />
         </button>
       ),
     },
