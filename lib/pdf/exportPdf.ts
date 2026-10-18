@@ -21,6 +21,12 @@ export function assertUnscaled(pageEl: HTMLElement): void {
 }
 
 export async function capturePageToCanvas(pageEl: HTMLElement): Promise<HTMLCanvasElement> {
+  let ancestor: HTMLElement | null = pageEl;
+  while (ancestor) {
+    ancestor.style.setProperty("transform", "none", "important");
+    ancestor.style.setProperty("zoom", "1", "important");
+    ancestor = ancestor.parentElement;
+  }
   assertUnscaled(pageEl);
   await document.fonts.ready;
   await Promise.all([
@@ -37,8 +43,8 @@ export async function capturePageToCanvas(pageEl: HTMLElement): Promise<HTMLCanv
     windowWidth: 794, windowHeight: 1123, x: 0, y: 0, scrollX: 0, scrollY: 0, logging: false,
     onclone: (clonedDocument) => {
       const clonedPage = clonedDocument.querySelector<HTMLElement>(".doc-page");
-      let current = clonedPage;
-      while (current) { current.style.transform = "none"; current.style.zoom = "1"; current = current.parentElement as HTMLElement | null; }
+      let current: HTMLElement | null = clonedPage;
+      while (current) { current.style.setProperty("transform", "none", "important"); current.style.setProperty("zoom", "1", "important"); current = current.parentElement; }
     },
   });
 }
