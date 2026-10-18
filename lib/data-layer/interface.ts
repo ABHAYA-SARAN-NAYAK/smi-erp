@@ -43,6 +43,7 @@ export interface DataLayer {
 
   // Attendance & Payroll
   getEmployees(): Promise<Employee[]>;
+  getAttendance(): Promise<AttendanceEntry[]>;
   markAttendance(employeeId: string, date: string, entry: AttendanceEntry): Promise<void>;
   getMonthlyPayroll(month: string): Promise<PayrollRow[]>;
 

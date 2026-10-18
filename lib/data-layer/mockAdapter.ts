@@ -415,6 +415,10 @@ export class MockDataAdapter implements DataLayer {
     return [...this.employees];
   }
 
+  async getAttendance(): Promise<AttendanceEntry[]> {
+    return this.attendanceEntries.map((entry) => ({ ...entry }));
+  }
+
   async markAttendance(
     employeeId: string,
     date: string,

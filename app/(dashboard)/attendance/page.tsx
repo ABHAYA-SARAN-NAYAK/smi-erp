@@ -72,8 +72,12 @@ export default function AttendancePage() {
       const defaultEmp = empList[0]?.id || "";
       setSelectedEmployeeId(defaultEmp);
 
-      const payroll = await dataLayer.getMonthlyPayroll(selectedMonth);
+      const [payroll, attendance] = await Promise.all([
+        dataLayer.getMonthlyPayroll(selectedMonth),
+        dataLayer.getAttendance(),
+      ]);
       setPayrollRows(payroll);
+      setAllAttendance(attendance);
     } catch (err: any) {
       console.error("Failed to load attendance data:", err);
       setError(err.message || "Failed to load data");
@@ -88,8 +92,12 @@ export default function AttendancePage() {
 
   const refreshPayroll = async () => {
     try {
-      const payroll = await dataLayer.getMonthlyPayroll(selectedMonth);
+      const [payroll, attendance] = await Promise.all([
+        dataLayer.getMonthlyPayroll(selectedMonth),
+        dataLayer.getAttendance(),
+      ]);
       setPayrollRows(payroll);
+      setAllAttendance(attendance);
     } catch (e) {
       console.error("Payroll refresh error", e);
     }
@@ -416,13 +424,13 @@ export default function AttendancePage() {
             </div>
             <div className="flex items-center gap-3 text-[11px]">
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded bg-[#e8f5e9] border border-[#2f8f5b]" /> Present
+                <span className="w-2.5 h-2.5 rounded bg-success/15 border border-success/60" /> Present
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded bg-amber-soft border border-amber" /> Holiday OT (2x)
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded bg-red-50 border border-danger" /> Absent
+                <span className="w-2.5 h-2.5 rounded bg-danger/15 border border-danger/60" /> Absent
               </span>
             </div>
           </div>
@@ -443,19 +451,19 @@ export default function AttendancePage() {
                   onClick={() => handleOpenDayModal(d.dateStr)}
                   className={`p-2.5 border rounded-xl cursor-pointer text-center transition-all hover:scale-105 ${
                     hasHolidayOt
-                      ? "bg-amber-soft/60 border-amber"
+                      ? "bg-amber-soft border-amber/70"
                       : isPresent
-                      ? "bg-[#e8f5e9]/70 border-[#c8e6c9]"
+                      ? "bg-success/15 border-success/60"
                       : entry?.status === "Absent"
-                      ? "bg-red-50 border-red-200"
-                      : "bg-slate-bg/40 border-line hover:border-amber/50"
+                      ? "bg-danger/15 border-danger/60"
+                      : "bg-slate-bg border-line hover:border-amber/70"
                   }`}
                 >
                   <div className="font-bold text-ink text-xs font-display">Day {d.dayNum}</div>
 
                   <div className="mt-1 flex flex-col items-center gap-0.5 text-[10px]">
                     {isPresent ? (
-                      <span className="text-[#2f8f5b] font-medium flex items-center gap-0.5">
+                      <span className="text-success font-medium flex items-center gap-0.5">
                         <CheckCircle2 className="w-2.5 h-2.5" /> Present
                       </span>
                     ) : entry?.status === "Absent" ? (
@@ -519,7 +527,7 @@ export default function AttendancePage() {
                 onClick={() => setDayStatus("Present")}
                 className={`py-2 rounded-lg font-semibold border transition-all ${
                   dayStatus === "Present"
-                    ? "bg-[#2f8f5b] text-white border-[#2f8f5b]"
+                    ? "bg-success text-white border-success"
                     : "bg-slate-bg border-line text-ink-soft"
                 }`}
               >
@@ -552,7 +560,7 @@ export default function AttendancePage() {
           </div>
 
           {/* Holiday OT Field (PRD §6.8: 2x rate multiplier) */}
-          <div className="p-3 bg-amber-soft/40 border border-amber/30 rounded-xl space-y-1">
+          <div className="p-3 bg-amber-soft border border-amber/40 rounded-xl space-y-1">
             <label className="font-bold text-amber block">
               ⭐ Holiday OT Hours (Calculated at 2x Rate Multiplier)
             </label>

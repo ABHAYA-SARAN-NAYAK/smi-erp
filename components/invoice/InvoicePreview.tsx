@@ -52,7 +52,15 @@ export function InvoicePreview({
     >
       {/* ── Document Header ── */}
       <div className="border-b border-line pb-5 flex items-start justify-between">
-        <div>
+        <div className="flex items-start gap-3">
+          {settings?.logoUrl ? (
+            <img
+              src={settings.logoUrl}
+              alt="Company logo"
+              className="h-14 w-20 shrink-0 object-contain"
+            />
+          ) : null}
+          <div>
           <h1 className="font-display text-2xl font-bold tracking-tight text-ink">
             {settings?.companyName || "SMI Industrial Components"}
           </h1>

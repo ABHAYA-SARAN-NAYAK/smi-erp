@@ -49,6 +49,7 @@ export class SheetsDataAdapter implements DataLayer {
   async recordJobWorkPayment(_id: string, _amount: number, _date: string): Promise<JobWorkRow> { this.notImplemented(); }
 
   async getEmployees(): Promise<Employee[]> { this.notImplemented(); }
+  async getAttendance(): Promise<AttendanceEntry[]> { this.notImplemented(); }
   async markAttendance(_employeeId: string, _date: string, _entry: AttendanceEntry): Promise<void> { this.notImplemented(); }
   async getMonthlyPayroll(_month: string): Promise<PayrollRow[]> { this.notImplemented(); }
 
