@@ -13,6 +13,11 @@ import {
   AttendanceEntry,
   PayrollRow,
   Settings,
+  Holiday,
+  PayrollMonthState,
+  PayrollMonthStatus,
+  SalaryPayment,
+  EmployeeAuditEvent,
 } from "./types";
 
 // Import initial demo data
@@ -38,7 +43,11 @@ const STORAGE_KEYS = {
   GST: "smi_gst",
   JOB_WORK: "smi_job_work",
   ATTENDANCE: "smi_attendance",
-  SETTINGS: "smi_settings",
+  SETTINGS: "smi_settings_v2",
+  HOLIDAYS: "smi_holidays_v1",
+  PAYROLL_STATUS: "smi_payroll_status_v1",
+  PAYMENTS: "smi_salary_payments_v1",
+  AUDIT: "smi_employee_audit_v1",
 };
 
 // Helper for date math: add days to YYYY-MM-DD
@@ -77,6 +86,10 @@ export class MockDataAdapter implements DataLayer {
   private jobWorkRows: JobWorkRow[];
   private attendanceEntries: AttendanceEntry[];
   private settings: Settings;
+  private holidays: Holiday[];
+  private payrollStatuses: PayrollMonthState[];
+  private salaryPayments: SalaryPayment[];
+  private auditEvents: EmployeeAuditEvent[];
 
   constructor() {
     this.companies = this.loadFromStorage(STORAGE_KEYS.COMPANIES, initialCompanies as Company[]);
@@ -92,6 +105,21 @@ export class MockDataAdapter implements DataLayer {
       ...storedSettings,
       logoUrl: storedSettings.logoUrl || DEFAULT_INVOICE_LOGO_URL,
     };
+    this.holidays = this.loadFromStorage(STORAGE_KEYS.HOLIDAYS, [] as Holiday[]);
+    this.payrollStatuses = this.loadFromStorage(STORAGE_KEYS.PAYROLL_STATUS, [] as PayrollMonthState[]);
+    this.salaryPayments = this.loadFromStorage(STORAGE_KEYS.PAYMENTS, [] as SalaryPayment[]);
+    this.auditEvents = this.loadFromStorage(STORAGE_KEYS.AUDIT, [] as EmployeeAuditEvent[]);
+    this.employees = this.employees.map((employee, index) => ({
+      ...employee,
+      id: employee.id || `EMP-${String(index + 1).padStart(3, "0")}`,
+      shiftHours: employee.shiftHours ?? 8,
+      weeklyOff: employee.weeklyOff ?? "Sunday",
+      joiningDate: employee.joiningDate ?? "2026-01-01",
+      lastWorkingDate: employee.lastWorkingDate ?? null,
+      status: employee.status ?? "Active",
+      createdAt: employee.createdAt ?? new Date().toISOString(),
+      updatedAt: employee.updatedAt ?? new Date().toISOString(),
+    }));
   }
 
   private loadFromStorage<T>(key: string, defaultValue: T): T {
@@ -425,8 +453,122 @@ export class MockDataAdapter implements DataLayer {
   }
 
   // ── Attendance & Payroll ──────────────────────────────────
-  async getEmployees(): Promise<Employee[]> {
-    return [...this.employees];
+  private recordEmployeeAudit(employeeId: string, action: EmployeeAuditEvent["action"], details: string): void {
+    this.auditEvents.unshift({
+      id: `audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      employeeId,
+      action,
+      details,
+      timestamp: new Date().toISOString(),
+    });
+    this.saveToStorage(STORAGE_KEYS.AUDIT, this.auditEvents);
+  }
+
+  async getEmployees(options?: { includeInactive?: boolean }): Promise<Employee[]> {
+    const employees = options?.includeInactive
+      ? this.employees
+      : this.employees.filter((employee) => employee.status !== "Inactive");
+    return employees.map((employee) => ({ ...employee }));
+  }
+
+  async getEmployeeById(id: string): Promise<Employee> {
+    const employee = this.employees.find((item) => item.id === id);
+    if (!employee) throw new Error("Employee not found");
+    return { ...employee };
+  }
+
+  async addEmployee(employee: Employee): Promise<Employee> {
+    const nextNumber = this.employees.reduce((max, item) => {
+      const match = /^EMP-(\\d+)$/.exec(item.id);
+      return Math.max(max, match ? Number(match[1]) : 0);
+    }, 0) + 1;
+    const now = new Date().toISOString();
+    const created: Employee = {
+      ...employee,
+      id: `EMP-${String(nextNumber).padStart(3, "0")}`,
+      status: "Active",
+      shiftHours: employee.shiftHours ?? 8,
+      weeklyOff: employee.weeklyOff ?? "Sunday",
+      lastWorkingDate: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.employees.push(created);
+    this.saveToStorage(STORAGE_KEYS.EMPLOYEES, this.employees);
+    this.recordEmployeeAudit(created.id, "created", "Employee created");
+    return { ...created };
+  }
+
+  async updateEmployee(id: string, changes: Partial<Employee>): Promise<Employee> {
+    const index = this.employees.findIndex((item) => item.id === id);
+    if (index < 0) throw new Error("Employee not found");
+    const current = this.employees[index];
+    const updated = { ...current, ...changes, id, joiningDate: current.joiningDate, updatedAt: new Date().toISOString() };
+    this.employees[index] = updated;
+    this.saveToStorage(STORAGE_KEYS.EMPLOYEES, this.employees);
+    this.recordEmployeeAudit(id, "edited", "Employee details updated");
+    return { ...updated };
+  }
+
+  async changeEmployeeRate(id: string, salaryType: Employee["salaryType"], rate: number, effectiveFrom: string): Promise<Employee> {
+    if (!(rate > 0) || !/^\\d{4}-\\d{2}-\\d{2}$/.test(effectiveFrom)) throw new Error("Invalid rate change");
+    const employee = await this.getEmployeeById(id);
+    const history = this.loadFromStorage(`smi_rate_history_${id}`, [] as Array<{ salaryType: Employee["salaryType"]; rate: number; effectiveFrom: string }>);
+    history.push({ salaryType, rate, effectiveFrom });
+    this.saveToStorage(`smi_rate_history_${id}`, history);
+    const updated = await this.updateEmployee(id, { salaryType, rate });
+    this.recordEmployeeAudit(id, "rate_changed", `${employee.salaryType} ₹${employee.rate} → ${salaryType} ₹${rate} effective ${effectiveFrom}`);
+    return updated;
+  }
+
+  async deactivateEmployee(id: string, lastWorkingDate: string): Promise<Employee> {
+    const updated = await this.updateEmployee(id, { status: "Inactive", lastWorkingDate });
+    this.recordEmployeeAudit(id, "deactivated", `Last working date ${lastWorkingDate}`);
+    return updated;
+  }
+
+  async reactivateEmployee(id: string, joiningDate: string): Promise<Employee> {
+    const updated = await this.updateEmployee(id, { status: "Active", joiningDate, lastWorkingDate: null });
+    this.recordEmployeeAudit(id, "reactivated", `New joining date ${joiningDate}`);
+    return updated;
+  }
+
+  async deleteEmployee(id: string): Promise<void> {
+    const hasHistory = this.attendanceEntries.some((entry) => entry.employeeId === id) || this.salaryPayments.some((payment) => payment.employeeId === id);
+    if (hasHistory) throw new Error("Employee has history, deactivate instead");
+    this.employees = this.employees.filter((employee) => employee.id !== id);
+    this.saveToStorage(STORAGE_KEYS.EMPLOYEES, this.employees);
+  }
+
+  async getHolidays(): Promise<Holiday[]> { return this.holidays.map((holiday) => ({ ...holiday })); }
+  async addHoliday(holiday: Holiday): Promise<Holiday> {
+    const created = { ...holiday, id: holiday.id || `holiday_${Date.now()}` };
+    this.holidays.push(created);
+    this.saveToStorage(STORAGE_KEYS.HOLIDAYS, this.holidays);
+    return { ...created };
+  }
+  async removeHoliday(id: string): Promise<void> {
+    this.holidays = this.holidays.filter((holiday) => holiday.id !== id);
+    this.saveToStorage(STORAGE_KEYS.HOLIDAYS, this.holidays);
+  }
+  async getPayrollMonthStatus(month: string): Promise<PayrollMonthState> {
+    return this.payrollStatuses.find((state) => state.month === month) ?? { month, status: "Draft", updatedAt: new Date().toISOString() };
+  }
+  async setPayrollMonthStatus(month: string, status: PayrollMonthStatus): Promise<PayrollMonthState> {
+    const state = { month, status, updatedAt: new Date().toISOString() };
+    const index = this.payrollStatuses.findIndex((item) => item.month === month);
+    if (index >= 0) this.payrollStatuses[index] = state; else this.payrollStatuses.push(state);
+    this.saveToStorage(STORAGE_KEYS.PAYROLL_STATUS, this.payrollStatuses);
+    return { ...state };
+  }
+  async markSalaryPaid(payment: SalaryPayment): Promise<SalaryPayment> {
+    const index = this.salaryPayments.findIndex((item) => item.employeeId === payment.employeeId && item.month === payment.month);
+    if (index >= 0) this.salaryPayments[index] = payment; else this.salaryPayments.push(payment);
+    this.saveToStorage(STORAGE_KEYS.PAYMENTS, this.salaryPayments);
+    return { ...payment };
+  }
+  async getEmployeeAuditLog(employeeId: string): Promise<EmployeeAuditEvent[]> {
+    return this.auditEvents.filter((event) => event.employeeId === employeeId).slice(0, 10).map((event) => ({ ...event }));
   }
 
   async getAttendance(): Promise<AttendanceEntry[]> {

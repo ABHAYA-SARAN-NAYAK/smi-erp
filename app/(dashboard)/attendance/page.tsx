@@ -31,7 +31,10 @@ import {
   XCircle,
   FileText,
   Eye,
+  Plus,
+  Pencil,
 } from "lucide-react";
+import { employeeInputSchema } from "@/lib/validation/employee";
 
 export default function AttendancePage() {
   const { success, error: toastError } = useToast();
@@ -58,6 +61,13 @@ export default function AttendancePage() {
   // Salary Slip Modal State
   const [viewSlipPayroll, setViewSlipPayroll] = useState<PayrollRow | null>(null);
   const [downloadingSlip, setDownloadingSlip] = useState(false);
+  const [employeePanelOpen, setEmployeePanelOpen] = useState(false);
+  const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
+  const [savingEmployee, setSavingEmployee] = useState(false);
+  const [employeeForm, setEmployeeForm] = useState({
+    name: "", designation: "", salaryType: "Monthly" as Employee["salaryType"], rate: "", shiftHours: "8",
+    weeklyOff: "Sunday" as NonNullable<Employee["weeklyOff"]>, joiningDate: new Date().toISOString().slice(0, 10), phone: "", notes: "",
+  });
 
   const loadData = async () => {
     setLoading(true);
@@ -90,6 +100,42 @@ export default function AttendancePage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const openEmployeePanel = (employee?: Employee) => {
+    setEditingEmployeeId(employee?.id ?? null);
+    setEmployeeForm({
+      name: employee?.name ?? "",
+      designation: employee?.designation ?? "",
+      salaryType: employee?.salaryType ?? "Monthly",
+      rate: employee ? String(employee.rate) : "",
+      shiftHours: String(employee?.shiftHours ?? 8),
+      weeklyOff: employee?.weeklyOff ?? "Sunday",
+      joiningDate: employee?.joiningDate ?? new Date().toISOString().slice(0, 10),
+      phone: employee?.phone ?? "",
+      notes: employee?.notes ?? "",
+    });
+    setEmployeePanelOpen(true);
+  };
+
+  const handleSaveEmployee = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSavingEmployee(true);
+    try {
+      const parsed = employeeInputSchema.parse({ ...employeeForm, rate: Number(employeeForm.rate), shiftHours: Number(employeeForm.shiftHours) });
+      const saved = editingEmployeeId
+        ? await dataLayer.updateEmployee(editingEmployeeId, parsed)
+        : await dataLayer.addEmployee(parsed as Employee);
+      const nextEmployees = await dataLayer.getEmployees({ includeInactive: true });
+      setEmployees(nextEmployees);
+      setSelectedEmployeeId(saved.id);
+      setEmployeePanelOpen(false);
+      success("Employee saved", `${saved.name} is ready for payroll.`);
+    } catch (err) {
+      toastError("Could not save employee", err instanceof Error ? err.message : "Check the highlighted fields.");
+    } finally {
+      setSavingEmployee(false);
+    }
+  };
 
   const refreshPayroll = async () => {
     try {
@@ -342,6 +388,9 @@ export default function AttendancePage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button type="button" onClick={() => openEmployeePanel()} className="inline-flex items-center gap-1.5 rounded-lg bg-amber px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-amber/90">
+            <Plus className="h-3.5 w-3.5" aria-hidden="true" /> Add Employee
+          </button>
           <span className="text-xs font-semibold text-ink">Month:</span>
           <span className="px-3 py-1.5 bg-amber-soft text-amber font-bold rounded-lg border border-amber/30 text-xs">
             {selectedMonth}
@@ -405,9 +454,14 @@ export default function AttendancePage() {
                     <h4 className="font-bold text-ink text-sm font-display">{emp.name}</h4>
                     <p className="text-[11px] text-ink-soft">{emp.designation}</p>
                   </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-bg border border-line text-ink-soft">
-                    {emp.salaryType} (₹{emp.rate})
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-bg border border-line text-ink-soft">
+                      {emp.salaryType} (₹{emp.rate})
+                    </span>
+                    <button type="button" onClick={(event) => { event.stopPropagation(); openEmployeePanel(emp); }} aria-label={`Edit ${emp.name}`} className="rounded-md p-1.5 text-ink-soft hover:bg-amber hover:text-white">
+                      <Pencil className="h-3 w-3" aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
 
                 {empPayroll && (
@@ -650,6 +704,46 @@ export default function AttendancePage() {
             settings={settings}
           />
         )}
+      </SidePanel>
+
+      <SidePanel
+        isOpen={employeePanelOpen}
+        onClose={() => setEmployeePanelOpen(false)}
+        title={editingEmployeeId ? "Edit Employee" : "Add Employee"}
+        subtitle="Employee details used for attendance and payroll"
+        width="md"
+      >
+        <form onSubmit={handleSaveEmployee} className="flex flex-col gap-4 text-xs">
+          <div>
+            <label htmlFor="employee-name" className="mb-1 block font-semibold text-ink">Full name *</label>
+            <input id="employee-name" required minLength={2} maxLength={60} value={employeeForm.name} onChange={(e) => setEmployeeForm({ ...employeeForm, name: e.target.value })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30" />
+          </div>
+          <div>
+            <label htmlFor="employee-designation" className="mb-1 block font-semibold text-ink">Designation *</label>
+            <input id="employee-designation" required value={employeeForm.designation} onChange={(e) => setEmployeeForm({ ...employeeForm, designation: e.target.value })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30" />
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(["Monthly", "Daily", "Hourly"] as const).map((type) => (
+              <button key={type} type="button" onClick={() => setEmployeeForm({ ...employeeForm, salaryType: type })} className={`rounded-lg border px-2 py-2 font-semibold ${employeeForm.salaryType === type ? "border-amber bg-amber-soft text-amber" : "border-line bg-panel-bg text-ink-soft"}`}>{type}</button>
+            ))}
+          </div>
+          <div>
+            <label htmlFor="employee-rate" className="mb-1 block font-semibold text-ink">{employeeForm.salaryType} rate (₹) *</label>
+            <input id="employee-rate" required type="number" min="0.01" step="0.01" value={employeeForm.rate} onChange={(e) => setEmployeeForm({ ...employeeForm, rate: e.target.value })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink focus:border-amber focus:outline-none focus:ring-2 focus:ring-amber/30" />
+          </div>
+          <div className="rounded-xl border border-amber/30 bg-amber-soft/40 p-3 text-ink">
+            <p className="font-semibold text-amber">Pay preview</p>
+            <p className="mt-1">{employeeForm.salaryType} ₹{Number(employeeForm.rate || 0).toLocaleString("en-IN")} · Shift {employeeForm.shiftHours || 8} hrs/day</p>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><label htmlFor="employee-shift" className="mb-1 block font-semibold text-ink">Shift hours/day</label><input id="employee-shift" type="number" min="1" max="24" value={employeeForm.shiftHours} onChange={(e) => setEmployeeForm({ ...employeeForm, shiftHours: e.target.value })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink" /></div>
+            <div><label htmlFor="employee-off" className="mb-1 block font-semibold text-ink">Weekly off</label><select id="employee-off" value={employeeForm.weeklyOff} onChange={(e) => setEmployeeForm({ ...employeeForm, weeklyOff: e.target.value as NonNullable<Employee["weeklyOff"]> })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink"><option>None</option><option>Sunday</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option></select></div>
+          </div>
+          <div><label htmlFor="employee-joining" className="mb-1 block font-semibold text-ink">Joining date *</label><input id="employee-joining" type="date" required readOnly={Boolean(editingEmployeeId)} value={employeeForm.joiningDate} onChange={(e) => setEmployeeForm({ ...employeeForm, joiningDate: e.target.value })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink" /></div>
+          <div><label htmlFor="employee-phone" className="mb-1 block font-semibold text-ink">Phone</label><input id="employee-phone" inputMode="numeric" pattern="[6-9][0-9]{9}" value={employeeForm.phone} onChange={(e) => setEmployeeForm({ ...employeeForm, phone: e.target.value })} className="w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink" /></div>
+          <div><label htmlFor="employee-notes" className="mb-1 block font-semibold text-ink">Notes</label><textarea id="employee-notes" maxLength={200} value={employeeForm.notes} onChange={(e) => setEmployeeForm({ ...employeeForm, notes: e.target.value })} className="min-h-20 w-full rounded-lg border border-line bg-panel-bg px-3 py-2 text-ink" /></div>
+          <button type="submit" disabled={savingEmployee} className="rounded-lg bg-amber px-4 py-2.5 font-semibold text-white disabled:opacity-60">{savingEmployee ? "Saving…" : editingEmployeeId ? "Save changes" : "Add employee"}</button>
+        </form>
       </SidePanel>
     </div>
   );

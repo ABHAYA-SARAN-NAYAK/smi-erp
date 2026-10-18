@@ -21,6 +21,9 @@ import {
  * PER AGENTS.md §3 & PRD §14:
  * This file is an empty/stub implementation. Do NOT wire up against real Google Sheets
  * until Phase 2 is explicitly authorized by the user with real Sheet IDs.
+ * Planned tabs: Employees (EmployeeID, Name, Designation, SalaryType, Rate, ShiftHours,
+ * WeeklyOff, JoiningDate, LastWorkingDate, Phone, Notes, Status, CreatedAt, UpdatedAt),
+ * Rate_History, Holidays, Payroll_Status, Audit_Log.
  */
 export class SheetsDataAdapter implements DataLayer {
   private notImplemented(): never {
@@ -48,7 +51,21 @@ export class SheetsDataAdapter implements DataLayer {
   async addJobWorkEntry(_entry: JobWorkRow): Promise<JobWorkRow> { this.notImplemented(); }
   async recordJobWorkPayment(_id: string, _amount: number, _date: string): Promise<JobWorkRow> { this.notImplemented(); }
 
-  async getEmployees(): Promise<Employee[]> { this.notImplemented(); }
+  async getEmployees(_options?: { includeInactive?: boolean }): Promise<Employee[]> { this.notImplemented(); }
+  async getEmployeeById(_id: string): Promise<Employee> { this.notImplemented(); }
+  async addEmployee(_employee: Employee): Promise<Employee> { this.notImplemented(); }
+  async updateEmployee(_id: string, _employee: Partial<Employee>): Promise<Employee> { this.notImplemented(); }
+  async changeEmployeeRate(_id: string, _salaryType: Employee["salaryType"], _rate: number, _effectiveFrom: string): Promise<Employee> { this.notImplemented(); }
+  async deactivateEmployee(_id: string, _lastWorkingDate: string): Promise<Employee> { this.notImplemented(); }
+  async reactivateEmployee(_id: string, _joiningDate: string): Promise<Employee> { this.notImplemented(); }
+  async deleteEmployee(_id: string): Promise<void> { this.notImplemented(); }
+  async getHolidays(): Promise<import("./types").Holiday[]> { this.notImplemented(); }
+  async addHoliday(_holiday: import("./types").Holiday): Promise<import("./types").Holiday> { this.notImplemented(); }
+  async removeHoliday(_id: string): Promise<void> { this.notImplemented(); }
+  async getPayrollMonthStatus(_month: string): Promise<import("./types").PayrollMonthState> { this.notImplemented(); }
+  async setPayrollMonthStatus(_month: string, _status: import("./types").PayrollMonthStatus): Promise<import("./types").PayrollMonthState> { this.notImplemented(); }
+  async markSalaryPaid(_payment: import("./types").SalaryPayment): Promise<import("./types").SalaryPayment> { this.notImplemented(); }
+  async getEmployeeAuditLog(_employeeId: string): Promise<import("./types").EmployeeAuditEvent[]> { this.notImplemented(); }
   async getAttendance(): Promise<AttendanceEntry[]> { this.notImplemented(); }
   async markAttendance(_employeeId: string, _date: string, _entry: AttendanceEntry): Promise<void> { this.notImplemented(); }
   async getMonthlyPayroll(_month: string): Promise<PayrollRow[]> { this.notImplemented(); }

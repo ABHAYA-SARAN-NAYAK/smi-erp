@@ -16,12 +16,64 @@ export interface Product {
   rate: number;
 }
 
+export type SalaryType = "Monthly" | "Daily" | "Hourly";
+export type EmployeeStatus = "Active" | "Inactive";
+export type WeeklyOffDay = "None" | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+
+export interface EmployeeRateHistory {
+  id: string;
+  employeeId: string;
+  salaryType: SalaryType;
+  rate: number;
+  effectiveFrom: string;
+  createdAt: string;
+}
+
 export interface Employee {
   id: string;
   name: string;
   designation: string;
-  salaryType: "Monthly" | "Daily" | "Hourly";
+  salaryType: SalaryType;
   rate: number;
+  shiftHours?: number;
+  weeklyOff?: WeeklyOffDay;
+  joiningDate?: string;
+  lastWorkingDate?: string | null;
+  phone?: string;
+  notes?: string;
+  status?: EmployeeStatus;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Holiday {
+  id: string;
+  date: string;
+  name: string;
+}
+
+export type PayrollMonthStatus = "Draft" | "Finalized" | "Paid";
+export type SalaryPaymentMode = "Cash" | "UPI" | "Bank transfer";
+
+export interface PayrollMonthState {
+  month: string;
+  status: PayrollMonthStatus;
+  updatedAt: string;
+}
+
+export interface SalaryPayment {
+  employeeId: string;
+  month: string;
+  paidDate: string;
+  mode: SalaryPaymentMode;
+}
+
+export interface EmployeeAuditEvent {
+  id: string;
+  employeeId: string;
+  action: "created" | "edited" | "rate_changed" | "deactivated" | "reactivated";
+  timestamp: string;
+  details: string;
 }
 
 export interface InvoiceItem {

@@ -42,7 +42,21 @@ export interface DataLayer {
   recordJobWorkPayment(id: string, amount: number, date: string): Promise<JobWorkRow>;
 
   // Attendance & Payroll
-  getEmployees(): Promise<Employee[]>;
+  getEmployees(options?: { includeInactive?: boolean }): Promise<Employee[]>;
+  getEmployeeById(id: string): Promise<Employee>;
+  addEmployee(employee: Employee): Promise<Employee>;
+  updateEmployee(id: string, employee: Partial<Employee>): Promise<Employee>;
+  changeEmployeeRate(id: string, salaryType: Employee["salaryType"], rate: number, effectiveFrom: string): Promise<Employee>;
+  deactivateEmployee(id: string, lastWorkingDate: string): Promise<Employee>;
+  reactivateEmployee(id: string, joiningDate: string): Promise<Employee>;
+  deleteEmployee(id: string): Promise<void>;
+  getHolidays(): Promise<import("./types").Holiday[]>;
+  addHoliday(holiday: import("./types").Holiday): Promise<import("./types").Holiday>;
+  removeHoliday(id: string): Promise<void>;
+  getPayrollMonthStatus(month: string): Promise<import("./types").PayrollMonthState>;
+  setPayrollMonthStatus(month: string, status: import("./types").PayrollMonthStatus): Promise<import("./types").PayrollMonthState>;
+  markSalaryPaid(payment: import("./types").SalaryPayment): Promise<import("./types").SalaryPayment>;
+  getEmployeeAuditLog(employeeId: string): Promise<import("./types").EmployeeAuditEvent[]>;
   getAttendance(): Promise<AttendanceEntry[]>;
   markAttendance(employeeId: string, date: string, entry: AttendanceEntry): Promise<void>;
   getMonthlyPayroll(month: string): Promise<PayrollRow[]>;
