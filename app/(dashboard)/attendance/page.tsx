@@ -40,7 +40,7 @@ export default function AttendancePage() {
 
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<string>("Sep-2026");
+  const [selectedMonth, setSelectedMonth] = useState<string>("Oct-2026");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
 
   const [payrollRows, setPayrollRows] = useState<PayrollRow[]>([]);
@@ -108,15 +108,24 @@ export default function AttendancePage() {
     [employees, selectedEmployeeId]
   );
 
-  // Generate 30 days for September 2026
   const monthDays = useMemo(() => {
+    const [monthName, yearText] = selectedMonth.split("-");
+    const monthIndex = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ].indexOf(monthName);
+    const year = Number(yearText);
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
     const days: { dayNum: number; dateStr: string }[] = [];
-    for (let i = 1; i <= 30; i++) {
-      const d = i < 10 ? `0${i}` : `${i}`;
-      days.push({ dayNum: i, dateStr: `2026-09-${d}` });
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      const day = String(i).padStart(2, "0");
+      const month = String(monthIndex + 1).padStart(2, "0");
+      days.push({ dayNum: i, dateStr: `${year}-${month}-${day}` });
     }
+
     return days;
-  }, []);
+  }, [selectedMonth]);
 
   // Handle Day Click
   const handleOpenDayModal = (dateStr: string) => {
