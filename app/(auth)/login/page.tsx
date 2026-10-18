@@ -59,7 +59,7 @@ function LoginForm() {
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#121317] bg-cover bg-center bg-fixed p-4 text-[#E9ECEF]"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(9, 14, 19, 0.7), rgba(9, 14, 19, 0.82)), url(https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312469/Cinematic_Teal-Orange_Machine_Shop_un1pjv.png)",
+          "linear-gradient(rgba(9, 14, 19, 0.3), rgba(9, 14, 19, 0.3)), url(https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312469/Cinematic_Teal-Orange_Machine_Shop_un1pjv.png)",
       }}
     >
       <div
@@ -72,14 +72,14 @@ function LoginForm() {
         }}
       />
 
-      <div className="relative z-10 w-full max-w-[510px] overflow-hidden rounded-[24px] border border-[#FB5607]/45 bg-[rgba(18,19,23,0.92)] p-6 shadow-[0_0_40px_rgba(251,86,7,0.18),0_24px_70px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:p-9">
+      <div className="relative z-10 w-full max-w-[430px] overflow-hidden rounded-[22px] border border-[#FB5607]/45 bg-[rgba(18,19,23,0.92)] p-5 shadow-[0_0_34px_rgba(251,86,7,0.18),0_20px_56px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:p-7">
         <div className="text-center">
           <img
             src="https://res.cloudinary.com/dkht5j3tw/image/upload/v1792312496/SRI_MUGAMBIGAI_Industries_Tech_Logo_ozoude.png"
             alt="Sri Mugambigai Industries logo"
-            className="mx-auto h-auto w-[260px] max-w-full object-contain"
+            className="mx-auto h-auto w-[220px] max-w-full object-contain"
           />
-          <h1 className="mt-5 font-display text-3xl font-bold tracking-tight text-[#E9ECEF]">
+          <h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-[#E9ECEF]">
             SMI ERP
           </h1>
           <p className="mt-2 text-sm text-[#8b8fa3]">
@@ -87,7 +87,7 @@ function LoginForm() {
           </p>
         </div>
 
-        <div className="mt-8 space-y-6">
+        <div className="mt-6 space-y-5">
 
           {/* Notifications */}
           {infoMsg && (
